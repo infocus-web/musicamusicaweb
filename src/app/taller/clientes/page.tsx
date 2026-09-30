@@ -17,6 +17,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
       <section className="space-y-4">
         <div className="flex flex-wrap items-end gap-3">
           <h1 className="mr-auto text-2xl font-semibold">Clientes</h1>
+          <Link href="/taller/clientes/importar" className="btn-ghost">Importar CSV</Link>
           <form className="flex gap-2">
             <input name="q" defaultValue={q} placeholder="Nombre, código o teléfono" className="rounded-xl border px-3 py-2 text-sm" style={{ borderColor: "var(--line)", background: "var(--card)" }} />
             <button className="btn-ghost">Buscar</button>
