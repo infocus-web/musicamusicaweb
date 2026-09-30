@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { salir } from "../login/actions";
+import { Logo } from "@/components/Logo";
 
 export default async function TallerLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -27,7 +28,7 @@ export default async function TallerLayout({ children }: { children: React.React
     <div className="min-h-screen">
       <header className="border-b" style={{ borderColor: "var(--line)" }}>
         <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 text-sm">
-          <Link href="/taller" className="font-semibold text-base">Musica Musica · Taller</Link>
+          <Link href="/taller" className="flex items-center gap-2 font-semibold"><Logo alto={32} /> <span>Taller</span></Link>
           <Link href="/taller" className="muted hover:underline">Trabajos</Link>
           <Link href="/taller/clientes" className="muted hover:underline">Clientes</Link>
           <form action={salir} className="ml-auto"><button className="muted hover:underline">Salir</button></form>

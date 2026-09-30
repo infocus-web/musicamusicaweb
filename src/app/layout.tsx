@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Musica Musica — Taller de instrumentos",
+  title: "Música Música Web — Taller de instrumentos",
   description: "Preparación y reparación de instrumentos musicales. Seguí el avance de tu instrumento online.",
 };
 

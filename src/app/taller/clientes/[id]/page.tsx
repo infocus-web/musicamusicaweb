@@ -18,7 +18,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   ]);
 
   const url = linkSeguimiento(c.token);
-  const mensaje = `Hola ${c.nombre}! Tu código de cliente en Musica Musica es ${c.codigo}. Podés seguir el avance de tus instrumentos acá: ${url}`;
+  const mensaje = `Hola ${c.nombre}! Tu código de cliente en Música Música Web es ${c.codigo}. Podés seguir el avance de tus instrumentos acá: ${url}`;
   const nombreInstrumento = (iid: string | null) => {
     const i = instrumentos?.find((x) => x.id === iid);
     return i ? [i.tipo, i.marca, i.modelo].filter(Boolean).join(" · ") : "—";

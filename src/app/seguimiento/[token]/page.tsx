@@ -4,10 +4,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ESTADOS, estadoInfo, formatoFecha, formatoFechaHora, formatoPesos } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { Media } from "@/components/Media";
+import { Logo } from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Seguimiento de tu instrumento — Musica Musica",
+  title: "Seguimiento de tu instrumento — Música Música Web",
   robots: { index: false, follow: false },
 };
 
@@ -52,7 +53,7 @@ export default async function SeguimientoPage({ params }: { params: Promise<{ to
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <header className="space-y-1">
-        <p className="text-xs uppercase tracking-widest muted">Musica Musica · Taller</p>
+        <Logo alto={56} prioridad />
         <h1 className="text-2xl font-semibold">Hola, {cliente.nombre.split(" ")[0]}</h1>
         <p className="muted text-sm">Código de cliente <span className="font-mono">{cliente.codigo}</span></p>
       </header>

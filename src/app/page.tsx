@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import logo from "../../public/logo.png";
 
 const SERVICIOS = [
   { t: "Puesta a punto", d: "Ajuste de alma, altura de cuerdas, octavación y limpieza general." },
@@ -10,24 +12,32 @@ const SERVICIOS = [
 export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-4">
-      <header className="flex items-center justify-between py-5">
-        <span className="font-semibold">Musica Musica</span>
+      <header className="flex items-center justify-end py-5">
         <Link href="/login" className="muted text-sm hover:underline">Acceso taller</Link>
       </header>
 
-      <section className="py-16 sm:py-24 space-y-5">
-        <p className="text-xs uppercase tracking-widest muted">Taller de instrumentos · Insumos</p>
-        <h1 className="text-4xl sm:text-6xl font-semibold leading-tight max-w-3xl">
-          Tu instrumento en buenas manos. Y vos, al tanto de cada paso.
-        </h1>
-        <p className="muted max-w-xl text-lg">
-          Preparamos, calibramos y reparamos instrumentos musicales. Cada cliente recibe un link privado para ver el estado de su trabajo, con fotos y videos del avance.
-        </p>
+      <section className="grid items-center gap-10 py-10 sm:py-16 lg:grid-cols-[1.1fr_1fr]">
+        <Image
+          src={logo}
+          alt="Música Música Web"
+          priority
+          sizes="(min-width: 1024px) 520px, 100vw"
+          className="h-auto w-full max-w-[560px]"
+        />
+        <div className="space-y-5">
+          <p className="text-xs uppercase tracking-widest" style={{ color: "var(--accent)" }}>Taller de instrumentos · Insumos</p>
+          <h1 className="text-3xl sm:text-5xl font-semibold leading-tight">
+            Tu instrumento en buenas manos. Y vos, al tanto de cada paso.
+          </h1>
+          <p className="muted text-lg">
+            Preparamos, calibramos y reparamos instrumentos musicales. Cada cliente recibe un link privado para ver el estado de su trabajo, con fotos y videos del avance.
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-4 pb-16 sm:grid-cols-2 lg:grid-cols-4">
         {SERVICIOS.map((s) => (
-          <div key={s.t} className="card space-y-1">
+          <div key={s.t} className="card space-y-1 border-t-4" style={{ borderTopColor: "var(--accent)" }}>
             <h2 className="font-semibold">{s.t}</h2>
             <p className="muted text-sm">{s.d}</p>
           </div>
@@ -40,7 +50,7 @@ export default function Home() {
       </section>
 
       <footer className="muted border-t py-6 text-sm" style={{ borderColor: "var(--line)" }}>
-        © {new Date().getFullYear()} Musica Musica · musicamusicaweb.com.ar
+        © {new Date().getFullYear()} Música Música Web · musicamusicaweb.com.ar
       </footer>
     </main>
   );
