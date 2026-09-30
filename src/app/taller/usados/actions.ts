@@ -57,6 +57,7 @@ export async function guardarUsado(id: string, fd: FormData) {
     acepta_permuta: fd.get("acepta_permuta") === "on",
     envio: fd.get("envio") === "on",
     destacado: fd.get("destacado") === "on",
+    venta_online: fd.get("venta_online") === "on",
     estado,
   };
   if (estado === "publicado" && previo?.estado !== "publicado") cambios.publicado_en = new Date().toISOString();

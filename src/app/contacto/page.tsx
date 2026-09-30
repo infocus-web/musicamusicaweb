@@ -13,7 +13,7 @@ export default async function ContactoPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-        <h1 className="text-3xl font-semibold">Contacto</h1>
+        <h1 className="titulo text-4xl">Contacto</h1>
         <div className="grid gap-4 sm:grid-cols-2">
           {wa && <a href={wa} target="_blank" rel="noreferrer" className="card space-y-1 hover:shadow-sm"><p className="muted text-sm">WhatsApp</p><p className="font-semibold">{a.whatsapp}</p></a>}
           {a.email && <a href={`mailto:${a.email}`} className="card space-y-1 hover:shadow-sm"><p className="muted text-sm">Email</p><p className="font-semibold">{a.email}</p></a>}

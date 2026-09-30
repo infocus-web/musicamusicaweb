@@ -9,6 +9,7 @@ import { siteUrl } from "@/lib/estados";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Galeria } from "@/components/Galeria";
 import { Compartir } from "@/components/Compartir";
+import { AgregarAlCarrito } from "@/components/AgregarAlCarrito";
 
 export const revalidate = 60;
 
@@ -87,6 +88,13 @@ export default async function UsadoPage({ params }: { params: Promise<{ codigo: 
               <li className="card !p-3 border-l-4" style={{ borderLeftColor: "var(--accent)" }}>Probalo en el taller</li>
             </ul>
 
+            {disponible && u.venta_online && u.moneda === "ARS" && u.precio ? (
+              <AgregarAlCarrito
+                base={{ tipo: "usado", id: u.id, nombre: u.titulo, foto: fotoUsado(u.fotos[0]), href: `/usados/${u.codigo}` }}
+                opciones={[{ varianteId: null, nombre: u.titulo, precio: Number(u.precio), stock: 1 }]}
+                mostrarPrecio={false}
+              />
+            ) : null}
             {disponible ? (
               <div className="flex flex-wrap gap-2">
                 {waConsulta ? <a href={waConsulta} target="_blank" rel="noreferrer" className="btn flex-1">Consultar por WhatsApp</a> : <span className="muted text-sm">Contacto próximamente.</span>}

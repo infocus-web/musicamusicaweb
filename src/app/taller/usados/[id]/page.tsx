@@ -57,6 +57,7 @@ export default async function EditarUsadoPage({ params }: { params: Promise<{ id
             <label className="flex items-center gap-2"><input type="checkbox" name="acepta_permuta" defaultChecked={u.acepta_permuta} /> Acepta permuta</label>
             <label className="flex items-center gap-2"><input type="checkbox" name="envio" defaultChecked={u.envio} /> Envío a todo el país</label>
             <label className="flex items-center gap-2"><input type="checkbox" name="destacado" defaultChecked={u.destacado} /> Destacado (sale primero)</label>
+            <label className="flex items-center gap-2"><input type="checkbox" name="venta_online" defaultChecked={u.venta_online} /> Se puede comprar online (solo precio en pesos)</label>
           </div>
           <label className="field col-span-2"><span>Descripción</span><textarea name="descripcion" rows={4} defaultValue={u.descripcion ?? ""} /></label>
           <label className="field col-span-2"><span>Características (una por línea)</span><textarea name="caracteristicas" rows={4} defaultValue={u.caracteristicas ?? ""} placeholder={"Cuerpo de aliso\nMástil de maple\nPastillas originales"} /></label>

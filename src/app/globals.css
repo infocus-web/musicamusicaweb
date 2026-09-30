@@ -1,31 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f6f6f6;
-  --fg: #0d0d0d;
-  --muted: #5e5e5e;
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #5f5f5f;
   --card: #ffffff;
-  --line: #e2e2e2;
-  --accent: #e50000;
+  --line: #e6e6e6;
+  --soft: #f4f4f4;
+  --accent: #d90000;
   --accent-fg: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b0b0b;
-    --fg: #f5f5f5;
-    --muted: #a3a3a3;
-    --card: #171717;
-    --line: #2c2c2c;
-    --accent: #ff2a2a;
-    --accent-fg: #ffffff;
-  }
+  color-scheme: light;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Títulos estilo taller: condensados, en mayúsculas */
+.titulo {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  font-weight: 700;
+  line-height: 1.05;
 }
 
 @layer components {
@@ -35,13 +34,13 @@ body {
     border-color: var(--line);
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50;
     background: var(--accent);
     color: var(--accent-fg);
   }
   .btn:hover:not(:disabled) { filter: brightness(1.08); }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition;
     border-color: var(--line);
   }
   .btn-ghost:hover { background: color-mix(in srgb, var(--fg) 5%, transparent); }
@@ -58,3 +57,25 @@ body {
   .muted { color: var(--muted); }
   .link { color: var(--accent); @apply underline-offset-2 hover:underline; }
 }
+
+/* ---------- Asesor (chat) ---------- */
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes latido { 0%, 100% { box-shadow: 0 0 0 0 rgba(229, 0, 0, .55); } 60% { box-shadow: 0 0 0 14px rgba(229, 0, 0, 0); } }
+@keyframes puntos { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+.aparecer { animation: aparecer .28s ease-out both; }
+.latido { animation: latido 2.2s ease-out infinite; }
+.punto { animation: puntos 1s infinite; }
+.punto:nth-child(2) { animation-delay: .15s; }
+.punto:nth-child(3) { animation-delay: .3s; }
+@media (prefers-reduced-motion: reduce) { .aparecer, .latido, .punto { animation: none; } }
+
+/* Botón contorno rojo (estilo "COMPRAR NOVEDADES") */
+.btn-rojo {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  border: 2px solid var(--accent); color: var(--accent); background: transparent;
+  padding: .6rem 1.4rem; border-radius: .4rem; font-weight: 700; text-transform: uppercase; font-size: .85rem; letter-spacing: .03em;
+  transition: background .15s, color .15s;
+}
+.btn-rojo:hover { background: var(--accent); color: var(--accent-fg); }
+.sin-barra::-webkit-scrollbar { display: none; }
+.sin-barra { scrollbar-width: none; }

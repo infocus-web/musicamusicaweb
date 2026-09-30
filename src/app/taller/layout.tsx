@@ -29,6 +29,8 @@ export default async function TallerLayout({ children }: { children: React.React
           <Link href="/taller" className="flex items-center gap-2 font-semibold"><Logo alto={32} /> <span>Taller</span></Link>
           <Link href="/taller" className="muted hover:underline">Trabajos</Link>
           <Link href="/taller/clientes" className="muted hover:underline">Clientes</Link>
+          <Link href="/taller/tienda" className="muted hover:underline">Tienda</Link>
+          <Link href="/taller/pedidos" className="muted hover:underline">Pedidos</Link>
           <Link href="/taller/usados" className="muted hover:underline">Usados</Link>
           <Link href="/taller/consultas" className="muted hover:underline">Consultas</Link>
           <Link href="/taller/nuestros-clientes" className="muted hover:underline">Nuestros clientes</Link>

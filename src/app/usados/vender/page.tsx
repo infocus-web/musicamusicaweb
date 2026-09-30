@@ -16,7 +16,7 @@ export default async function VenderPage({ searchParams }: { searchParams: Promi
       <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
         <header className="space-y-2">
           <p className="text-xs uppercase tracking-widest" style={{ color: "var(--accent)" }}>Tasación online</p>
-          <h1 className="text-3xl font-semibold">Vendé o permutá tu instrumento</h1>
+          <h1 className="titulo text-4xl">Vendé o permutá tu instrumento</h1>
           <p className="muted">Mandanos los datos y unas fotos. Lo evaluamos en el taller y te respondemos por WhatsApp con una propuesta.</p>
         </header>
         <FormTasacion permuta={codigo} />

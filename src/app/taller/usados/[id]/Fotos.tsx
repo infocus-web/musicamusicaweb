@@ -23,7 +23,7 @@ export function Fotos({ id, iniciales }: { id: string; iniciales: string[] }) {
     const agregadas: string[] = [];
     for (let i = 0; i < files.length; i++) {
       setMsg(`Subiendo ${i + 1} de ${files.length}…`);
-      const blob = await comprimirImagen(files[i], 2000, 0.85);
+      const blob = await comprimirImagen(files[i], 2200, 0.88);
       const path = `${id}/${Date.now()}-${crypto.randomUUID().slice(0, 6)}.jpg`;
       const { error } = await sb.storage.from("usados").upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000" });
       if (error) { setMsg(`Error: ${error.message}`); return; }

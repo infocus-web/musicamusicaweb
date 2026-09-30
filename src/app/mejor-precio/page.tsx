@@ -14,7 +14,7 @@ export default function MejorPrecioPage() {
       <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
         <header className="space-y-2">
           <p className="text-xs uppercase tracking-widest" style={{ color: "var(--accent)" }}>Mejoramos tu presupuesto</p>
-          <h1 className="text-3xl font-semibold">¿Ya te pasaron un presupuesto?</h1>
+          <h1 className="titulo text-4xl">¿Ya te pasaron un presupuesto?</h1>
           <p className="muted">De un instrumento o de una reparación: mandanos la foto, lo analizamos y te respondemos por WhatsApp con nuestra mejor propuesta.</p>
         </header>
         <FormPresupuesto />

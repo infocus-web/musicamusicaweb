@@ -22,7 +22,7 @@ export default async function NuestrosClientesPage() {
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
         <header className="space-y-2">
           <p className="text-xs uppercase tracking-widest" style={{ color: "var(--accent)" }}>Nuestros clientes</p>
-          <h1 className="text-3xl sm:text-4xl font-semibold">Trabajos reales, opiniones reales</h1>
+          <h1 className="titulo text-4xl sm:text-5xl">Trabajos reales, opiniones reales</h1>
           <p className="muted max-w-2xl">Instrumentos que pasaron por el taller, con fotos del antes y el después y lo que dijo cada cliente al retirarlo.</p>
           {promedio && (
             <p className="text-lg"><span style={{ color: "#f5b301" }}>{estrellas(Math.round(promedio))}</span> <b>{promedio.toFixed(1)}</b> <span className="muted">· {resenas.length} opiniones de clientes</span></p>
