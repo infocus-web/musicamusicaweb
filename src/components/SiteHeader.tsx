@@ -11,7 +11,6 @@ const NAV = [
   { href: "/tienda?cat=cuerdas", label: "Cuerdas y accesorios" },
   { href: "/tienda?cat=servicios", label: "Servicios del taller" },
   { href: "/usados", label: "Usados" },
-  { href: "/usados?seccion=premium", label: "Usados premium" },
   { href: "/usados/vender", label: "Vendé tu usado" },
   { href: "/nuestros-clientes", label: "Nuestros clientes" },
   { href: "/usados?seccion=liquidacion", label: "Liquidación", rojo: true },

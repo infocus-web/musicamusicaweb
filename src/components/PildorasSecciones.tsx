@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SECCIONES } from "@/lib/usados";
 
-/** Botones Usados · Liquidación · Usados Premium. */
+/** Botones Usados · Liquidación. */
 export function PildorasSecciones({ activa, href }: { activa?: string; href: (seccion?: string) => string }) {
   return (
     <div className="flex flex-wrap gap-2">

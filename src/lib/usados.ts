@@ -14,7 +14,6 @@ export const CATEGORIAS_USADOS = [
 export const SECCIONES = [
   { id: "usados", label: "Usados", clase: "bg-zinc-900 text-white", icono: "⚡", bajada: "Instrumentos usados revisados en el taller, listos para tocar." },
   { id: "liquidacion", label: "Liquidación", clase: "bg-red-600 text-white", icono: "✺", bajada: "Oportunidades con precio rebajado, nuevos y usados, hasta agotar stock." },
-  { id: "premium", label: "Usados Premium", clase: "bg-amber-500 text-black", icono: "★", bajada: "Equipos de alta gama seleccionados, revisados uno por uno y en estado impecable." },
 ] as const;
 export type SeccionId = (typeof SECCIONES)[number]["id"];
 export const seccionInfo = (id: string) => SECCIONES.find((s) => s.id === id) ?? SECCIONES[0];

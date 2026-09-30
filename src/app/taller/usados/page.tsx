@@ -22,7 +22,7 @@ export default async function UsadosTallerPage({ searchParams }: { searchParams:
     <div className="space-y-5">
       <div className="flex flex-wrap items-end gap-3">
         <div className="mr-auto">
-          <h1 className="text-2xl font-semibold">Usados, liquidación y premium</h1>
+          <h1 className="text-2xl font-semibold">Usados y liquidación</h1>
           <p className="muted text-sm">Lo que publiques aparece en <Link href="/usados" className="link" target="_blank">/usados</Link>.</p>
         </div>
         <Link href="/taller/consultas" className="btn-ghost">Tasaciones y consultas</Link>

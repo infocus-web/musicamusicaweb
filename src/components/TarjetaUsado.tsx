@@ -14,7 +14,7 @@ export function TarjetaUsado({ u }: { u: Props }) {
   const etiqueta = vendido ? "Vendido" : u.estado === "reservado" ? "Reservado" : u.seccion !== "usados" ? sec.label : null;
   return (
     <Link href={`/usados/${u.codigo}`} className="group flex h-full flex-col rounded-lg border bg-white p-3 transition hover:shadow-lg"
-      style={{ borderColor: u.seccion === "premium" ? "#d4a017" : "var(--line)", opacity: vendido ? 0.6 : 1 }}>
+      style={{ borderColor: "var(--line)", opacity: vendido ? 0.6 : 1 }}>
       <div className="relative">
         <div className="aspect-square overflow-hidden rounded bg-white">
           {foto ? <img src={foto} alt={u.titulo} loading="lazy" className="h-full w-full object-contain transition duration-300 group-hover:scale-105" />
