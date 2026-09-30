@@ -191,3 +191,11 @@ export async function bloquearAccesoCliente(clienteId: string) {
   }
   revalidatePath(`/taller/clientes/${clienteId}`);
 }
+
+export async function marcarRevisado(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("clientes").update({ revisado: true }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/taller/clientes/${id}`);
+  revalidatePath("/taller/clientes");
+}

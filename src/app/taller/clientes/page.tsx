@@ -1,16 +1,23 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { crearCliente } from "../actions";
+import { CopiarLink } from "@/components/CopiarLink";
+import { siteUrl } from "@/lib/estados";
 
-export default async function ClientesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const { q } = await searchParams;
+export default async function ClientesPage({ searchParams }: { searchParams: Promise<{ q?: string; nuevos?: string }> }) {
+  const { q, nuevos } = await searchParams;
   const supabase = await createClient();
-  let query = supabase.from("clientes").select("id, codigo, nombre, telefono, email").order("creado_en", { ascending: false }).limit(200);
+  let query = supabase.from("clientes").select("id, codigo, nombre, telefono, email, origen, revisado").order("creado_en", { ascending: false }).limit(200);
   if (q) {
     const s = q.replace(/[%,()]/g, " ");
     query = query.or(`nombre.ilike.%${s}%,codigo.ilike.%${s}%,telefono.ilike.%${s}%`);
   }
+  if (nuevos) query = query.eq("revisado", false);
   const { data: clientes } = await query;
+  const { count: sinRevisar } = await supabase.from("clientes").select("id", { count: "exact", head: true }).eq("revisado", false);
+
+  const linkRegistro = `${siteUrl()}/registro`;
+  const textoRegistro = `¡Hola! Para registrarte como cliente de Música Música Web y seguir tus instrumentos online, completá tus datos acá: ${linkRegistro}`;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -23,6 +30,11 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
             <button className="btn-ghost">Buscar</button>
           </form>
         </div>
+        {(sinRevisar ?? 0) > 0 && (
+          <Link href={nuevos ? "/taller/clientes" : "/taller/clientes?nuevos=1"} className="block rounded-xl p-3 text-sm" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
+            {nuevos ? "← Ver todos los clientes" : `${sinRevisar} cliente(s) se registraron solos y falta revisarlos → ver`}
+          </Link>
+        )}
         <div className="card overflow-x-auto p-0">
           <table className="w-full text-sm">
             <thead className="muted text-left">
@@ -32,7 +44,10 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
               {(clientes ?? []).map((c) => (
                 <tr key={c.id} className="border-t" style={{ borderColor: "var(--line)" }}>
                   <td className="p-3 font-mono"><Link className="link" href={`/taller/clientes/${c.id}`}>{c.codigo}</Link></td>
-                  <td className="p-3"><Link href={`/taller/clientes/${c.id}`}>{c.nombre}</Link></td>
+                  <td className="p-3">
+                    <Link href={`/taller/clientes/${c.id}`}>{c.nombre}</Link>
+                    {!c.revisado && <span className="badge ml-2 bg-red-100 text-red-700">Nuevo</span>}
+                  </td>
                   <td className="p-3">{c.telefono ?? "—"}</td>
                   <td className="p-3">{c.email ?? "—"}</td>
                 </tr>
@@ -45,7 +60,17 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
         </div>
       </section>
 
-      <aside>
+      <aside className="space-y-6">
+        <section className="card space-y-3">
+          <h2 className="text-lg font-semibold">Link de registro</h2>
+          <p className="muted text-xs">Compartilo y cada cliente carga sus datos y su instrumento. Aparece acá marcado como “Nuevo”.</p>
+          <p className="break-all font-mono text-xs">{linkRegistro}</p>
+          <div className="flex flex-wrap gap-2">
+            <CopiarLink url={linkRegistro} />
+            <a className="btn" href={`https://wa.me/?text=${encodeURIComponent(textoRegistro)}`} target="_blank" rel="noreferrer">Compartir por WhatsApp</a>
+          </div>
+        </section>
+
         <form action={crearCliente} className="card space-y-3">
           <h2 className="text-lg font-semibold">Nuevo cliente</h2>
           <p className="muted text-xs">El código (MM-0001…) y el link privado se generan solos.</p>

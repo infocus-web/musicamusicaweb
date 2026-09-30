@@ -68,7 +68,7 @@ export async function importarClientes(filas: FilaCliente[], omitirExistentes: b
     const { data, error } = await supabase
       .from("clientes")
       .insert(lote.map(({ fila }) => ({
-        nombre: fila.nombre, telefono: vacio(fila.telefono), email: vacio(fila.email), notas: vacio(fila.notas),
+        nombre: fila.nombre, telefono: vacio(fila.telefono), email: vacio(fila.email), notas: vacio(fila.notas), origen: "importado",
       })))
       .select("id");
     if (error || !data) {

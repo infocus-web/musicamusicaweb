@@ -13,6 +13,7 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-4">
       <header className="flex items-center justify-end gap-5 py-5 text-sm">
+        <Link href="/registro" className="hover:underline">Registrate</Link>
         <Link href="/mi-cuenta" className="hover:underline">Mi cuenta</Link>
         <Link href="/login" className="muted hover:underline">Acceso taller</Link>
       </header>
@@ -48,7 +49,10 @@ export default function Home() {
       <section className="card mb-16 space-y-2">
         <h2 className="text-xl font-semibold">¿Ya dejaste tu instrumento?</h2>
         <p className="muted">Abrí el link que te mandamos por WhatsApp, o entrá con tu código de cliente y tu clave para ver en qué etapa está y los videos del trabajo.</p>
-        <Link href="/mi-cuenta" className="btn mt-2">Entrar a mi cuenta</Link>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Link href="/mi-cuenta" className="btn">Entrar a mi cuenta</Link>
+          <Link href="/registro" className="btn-ghost">Registrarme como cliente</Link>
+        </div>
       </section>
 
       <footer className="muted border-t py-6 text-sm" style={{ borderColor: "var(--line)" }}>

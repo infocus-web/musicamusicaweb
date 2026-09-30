@@ -5,7 +5,7 @@ import { SERVICIOS, TIPOS_INSTRUMENTO, formatoFecha, linkSeguimiento, linkWhatsA
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { CopiarLink } from "@/components/CopiarLink";
 import { AccesoCliente } from "@/components/AccesoCliente";
-import { actualizarCliente, crearInstrumento, crearTrabajo, regenerarLink } from "../../actions";
+import { actualizarCliente, crearInstrumento, crearTrabajo, marcarRevisado, regenerarLink } from "../../actions";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,6 +31,13 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
         <Link href="/taller/clientes" className="muted text-sm hover:underline">← Clientes</Link>
         <h1 className="text-2xl font-semibold">{c.nombre} <span className="font-mono text-base muted">{c.codigo}</span></h1>
       </div>
+
+      {!c.revisado && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl p-3 text-sm" style={{ background: "color-mix(in srgb, var(--accent) 10%, transparent)" }}>
+          <span className="mr-auto">Este cliente se registró solo desde el link. Revisá sus datos.</span>
+          <form action={marcarRevisado.bind(null, c.id)}><button className="btn">Marcar como revisado</button></form>
+        </div>
+      )}
 
       <section className="card space-y-3">
         <h2 className="font-semibold">Link privado de seguimiento</h2>
