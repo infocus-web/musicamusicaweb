@@ -6,6 +6,7 @@ import { EditorFotos } from "@/components/EditorFotos";
 import { borrarProducto, guardarFotosProducto, guardarProducto } from "../actions";
 import { Variantes } from "./Variantes";
 import { CampoVideos } from "@/components/CampoVideos";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function EditarProductoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -50,7 +51,7 @@ export default async function EditarProductoPage({ params }: { params: Promise<{
           </div>
           <div className="flex items-center justify-between sm:col-span-2">
             <button formAction={borrarProducto.bind(null, p.id)} formNoValidate className="text-sm text-red-600 hover:underline">Borrar</button>
-            <button className="btn">Guardar</button>
+            <BotonGuardar />
           </div>
         </form>
         <EditorFotos carpeta={p.id} bucket="productos" iniciales={p.fotos} guardar={guardarFotosProducto.bind(null, p.id)} />

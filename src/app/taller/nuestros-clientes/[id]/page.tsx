@@ -5,6 +5,7 @@ import { estrellas, type Caso, type Resena } from "@/lib/casos";
 import { borrarCaso, guardarCaso } from "../actions";
 import { MediaEditor } from "./MediaEditor";
 import { CampoVideos } from "@/components/CampoVideos";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function EditarCasoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -39,7 +40,7 @@ export default async function EditarCasoPage({ params }: { params: Promise<{ id:
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="publicado" defaultChecked={c.publicado} /> Publicado en la web</label>
           <div className="flex items-center justify-between sm:col-span-2">
             <button formAction={borrarCaso.bind(null, c.id)} formNoValidate className="text-sm text-red-600 hover:underline">Borrar</button>
-            <button className="btn">Guardar</button>
+            <BotonGuardar />
           </div>
         </form>
         <MediaEditor id={c.id} inicial={c.media} />

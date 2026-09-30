@@ -6,6 +6,7 @@ import { EstadoBadge } from "@/components/EstadoBadge";
 import { CopiarLink } from "@/components/CopiarLink";
 import { AccesoCliente } from "@/components/AccesoCliente";
 import { actualizarCliente, crearInstrumento, crearTrabajo, marcarRevisado, regenerarLink } from "../../actions";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -133,7 +134,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             <label className="field"><span>Teléfono</span><input name="telefono" defaultValue={c.telefono ?? ""} /></label>
             <label className="field"><span>Email</span><input name="email" type="email" defaultValue={c.email ?? ""} /></label>
             <label className="field"><span>Notas</span><textarea name="notas" rows={2} defaultValue={c.notas ?? ""} /></label>
-            <button className="btn-ghost">Guardar cambios</button>
+            <BotonGuardar className="btn-ghost">Guardar cambios</BotonGuardar>
           </form>
         </div>
       </div>

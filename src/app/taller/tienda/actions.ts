@@ -72,14 +72,20 @@ export async function guardarProducto(id: string, fd: FormData) {
   refrescar(id, slug);
 }
 
-export async function guardarFotosProducto(id: string, fotos: string[]) {
+/** Igual que en usados: nunca pierde fotos por una lista vieja; solo borra lo pedido en `quitar`. */
+export async function guardarFotosProducto(id: string, fotos: string[], quitar: string[] = []): Promise<string[]> {
   const supabase = await createClient();
   const { data: previo } = await supabase.from("productos").select("fotos, slug").eq("id", id).single();
-  const limpias = fotos.filter((f) => f.startsWith(`${id}/`)).slice(0, 15);
-  await supabase.from("productos").update({ fotos: limpias }).eq("id", id);
-  const quitadas = (previo?.fotos ?? []).filter((f: string) => !limpias.includes(f));
-  if (quitadas.length) await supabase.storage.from("productos").remove(quitadas);
+  const propia = (f: unknown): f is string => typeof f === "string" && f.startsWith(`${id}/`);
+  const fuera = new Set(quitar.filter(propia));
+  const pedidas = [...new Set(fotos.filter(propia))].filter((f) => !fuera.has(f));
+  const extras = ((previo?.fotos ?? []) as string[]).filter((f) => !pedidas.includes(f) && !fuera.has(f));
+  const final = [...pedidas, ...extras].slice(0, 15);
+  const { error } = await supabase.from("productos").update({ fotos: final }).eq("id", id);
+  if (error) throw new Error(error.message);
+  if (fuera.size) await supabase.storage.from("productos").remove([...fuera]);
   refrescar(id, previo?.slug);
+  return final;
 }
 
 export async function borrarProducto(id: string) {

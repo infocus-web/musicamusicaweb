@@ -79,16 +79,24 @@ export async function cambiarEstadoUsado(id: string, estado: string) {
   refrescar(id, data?.codigo);
 }
 
-/** Guarda el orden de las fotos (la primera es la portada) y borra del bucket las que se quitaron. */
-export async function guardarFotos(id: string, fotos: string[]) {
+/**
+ * Guarda la lista de fotos (la primera es la portada). Nunca pierde fotos por una lista vieja:
+ * lo que ya está en la base y no vino en la lista se conserva al final. Solo borra lo pedido en `quitar`.
+ * Devuelve la lista final para que el panel quede igual que la base.
+ */
+export async function guardarFotos(id: string, fotos: string[], quitar: string[] = []): Promise<string[]> {
   const supabase = await createClient();
   const { data: previo } = await supabase.from("usados").select("fotos, codigo").eq("id", id).single();
-  const limpias = fotos.filter((f) => typeof f === "string" && f.startsWith(`${id}/`)).slice(0, 20);
-  const { error } = await supabase.from("usados").update({ fotos: limpias }).eq("id", id);
+  const propia = (f: unknown): f is string => typeof f === "string" && f.startsWith(`${id}/`);
+  const fuera = new Set(quitar.filter(propia));
+  const pedidas = [...new Set(fotos.filter(propia))].filter((f) => !fuera.has(f));
+  const extras = ((previo?.fotos ?? []) as string[]).filter((f) => !pedidas.includes(f) && !fuera.has(f));
+  const final = [...pedidas, ...extras].slice(0, 20);
+  const { error } = await supabase.from("usados").update({ fotos: final }).eq("id", id);
   if (error) throw new Error(error.message);
-  const quitadas = (previo?.fotos ?? []).filter((f: string) => !limpias.includes(f));
-  if (quitadas.length) await supabase.storage.from("usados").remove(quitadas);
+  if (fuera.size) await supabase.storage.from("usados").remove([...fuera]);
   refrescar(id, previo?.codigo);
+  return final;
 }
 
 export async function borrarUsado(id: string) {

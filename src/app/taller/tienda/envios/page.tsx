@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { guardarEnvios } from "../actions";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 const TIPO: Record<string, string> = { retiro: "Retiro (gratis)", fijo: "Costo fijo", correo: "Correo: se cotiza en cada pedido", moto: "Moto/cadete: se coordina por WhatsApp" };
 
@@ -31,7 +32,7 @@ export default async function EnviosPage() {
           )}
         </section>
       ))}
-      <button className="btn">Guardar</button>
+      <BotonGuardar />
     </form>
   );
 }

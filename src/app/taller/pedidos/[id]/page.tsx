@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ESTADOS_PEDIDO, PAGOS, pesos } from "@/lib/tienda";
 import { formatoFechaHora, linkWhatsApp, siteUrl } from "@/lib/estados";
 import { cancelar, cotizarEnvio, datosInternos, estadoPedido, marcarPagado } from "../actions";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function PedidoTallerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -82,7 +83,7 @@ export default async function PedidoTallerPage({ params }: { params: Promise<{ i
           <form action={datosInternos.bind(null, p.id)} className="card space-y-2">
             <label className="field"><span>N° de seguimiento del envío</span><input name="seguimiento" defaultValue={p.seguimiento_envio ?? ""} /></label>
             <label className="field"><span>Notas internas</span><textarea name="notas_internas" rows={2} defaultValue={p.notas_internas ?? ""} /></label>
-            <button className="btn-ghost w-full">Guardar</button>
+            <BotonGuardar className="btn-ghost w-full" />
           </form>
           {p.estado !== "cancelado" && (
             <form action={cancelar.bind(null, p.id)} className="text-right">

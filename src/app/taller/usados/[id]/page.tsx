@@ -6,6 +6,7 @@ import { cambiarEstadoUsado, guardarUsado } from "../actions";
 import { Fotos } from "./Fotos";
 import { BorrarUsado } from "./BorrarUsado";
 import { CampoVideos } from "@/components/CampoVideos";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function EditarUsadoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -29,9 +30,15 @@ export default async function EditarUsadoPage({ params }: { params: Promise<{ id
         {u.estado !== "vendido" && u.estado !== "borrador" && <form action={cambiarEstadoUsado.bind(null, u.id, "vendido")}><button className="btn-ghost">Marcar vendido</button></form>}
       </div>
 
+      {u.estado === "borrador" && (
+        <p className="rounded-lg border px-4 py-3 text-sm" style={{ borderColor: "#f59e0b", background: "#fffbeb" }}>
+          <b>Borrador:</b> se guarda, pero todavía no se ve en la web. Cuando esté listo, tocá <b>Publicar</b> (o elegí “Publicado” en “Estado de la publicación” y guardá).
+        </p>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
         <form action={guardarUsado.bind(null, u.id)} className="card grid grid-cols-2 gap-3">
-          <label className="field col-span-2"><span>Título</span><input name="titulo" defaultValue={u.titulo} required placeholder="Fender Stratocaster American Standard 2012" /></label>
+          <label className="field col-span-2"><span>Título</span><input name="titulo" defaultValue={u.titulo} required placeholder="Ej.: Fender Stratocaster American Standard 2012" /></label>
           <label className="field"><span>Sección</span>
             <select name="seccion" defaultValue={u.seccion}>{SECCIONES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select>
           </label>
@@ -61,13 +68,13 @@ export default async function EditarUsadoPage({ params }: { params: Promise<{ id
             <label className="flex items-center gap-2"><input type="checkbox" name="venta_online" defaultChecked={u.venta_online} /> Se puede comprar online (solo precio en pesos)</label>
           </div>
           <label className="field col-span-2"><span>Descripción</span><textarea name="descripcion" rows={4} defaultValue={u.descripcion ?? ""} /></label>
-          <label className="field col-span-2"><span>Características (una por línea)</span><textarea name="caracteristicas" rows={4} defaultValue={u.caracteristicas ?? ""} placeholder={"Cuerpo de aliso\nMástil de maple\nPastillas originales"} /></label>
-          <label className="field col-span-2"><span>Qué le hicimos en el taller (una por línea)</span><textarea name="revision" rows={4} defaultValue={u.revision ?? ""} placeholder={"Calibración completa\nLimpieza de potes\nCuerdas nuevas"} /></label>
+          <label className="field col-span-2"><span>Características (una por línea)</span><textarea name="caracteristicas" rows={4} defaultValue={u.caracteristicas ?? ""} placeholder={"Ej.: Cuerpo de aliso\nMástil de maple\nPastillas originales\n(esto es un ejemplo, escribí lo tuyo)"} /></label>
+          <label className="field col-span-2"><span>Qué le hicimos en el taller (una por línea)</span><textarea name="revision" rows={4} defaultValue={u.revision ?? ""} placeholder={"Ej.: Calibración completa\nLimpieza de potes\nCuerdas nuevas\n(esto es un ejemplo, escribí lo tuyo)"} /></label>
           <CampoVideos inicial={u.videos ?? []} className="col-span-2" />
-          <label className="field col-span-2"><span>Incluye (una por línea)</span><textarea name="incluye" rows={2} defaultValue={u.incluye ?? ""} placeholder={"Estuche rígido original"} /></label>
+          <label className="field col-span-2"><span>Incluye (una por línea)</span><textarea name="incluye" rows={2} defaultValue={u.incluye ?? ""} placeholder={"Ej.: Estuche rígido original"} /></label>
           <div className="col-span-2 flex items-center justify-between gap-3">
             <BorrarUsado id={u.id} />
-            <button className="btn">Guardar</button>
+            <BotonGuardar aviso={u.estado === "borrador" ? "Está como borrador: tocá “Publicar” (arriba) para que aparezca en la web." : undefined} />
           </div>
         </form>
 

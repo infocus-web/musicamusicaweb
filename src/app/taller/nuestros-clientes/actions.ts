@@ -69,14 +69,21 @@ export async function guardarCaso(id: string, fd: FormData) {
   refrescar(id);
 }
 
-export async function guardarMediaCaso(id: string, media: MediaCaso[]) {
+/** Igual que en usados: nunca pierde archivos por una lista vieja; solo borra lo pedido en `quitar`. */
+export async function guardarMediaCaso(id: string, media: MediaCaso[], quitar: string[] = []): Promise<MediaCaso[]> {
   const supabase = await createClient();
   const { data: previo } = await supabase.from("casos").select("media").eq("id", id).single();
-  const limpia = media.filter((m) => m.path.startsWith(`${id}/`) && (m.tipo === "foto" || m.tipo === "video")).slice(0, 30);
-  await supabase.from("casos").update({ media: limpia }).eq("id", id);
-  const quitadas = ((previo?.media ?? []) as MediaCaso[]).map((m) => m.path).filter((p) => !limpia.some((m) => m.path === p));
-  if (quitadas.length) await supabase.storage.from("casos").remove(quitadas);
+  const propia = (p: unknown): p is string => typeof p === "string" && p.startsWith(`${id}/`);
+  const fuera = new Set(quitar.filter(propia));
+  const vistos = new Set<string>();
+  const pedidas = media.filter((m) => propia(m.path) && (m.tipo === "foto" || m.tipo === "video") && !fuera.has(m.path) && !vistos.has(m.path) && vistos.add(m.path));
+  const extras = ((previo?.media ?? []) as MediaCaso[]).filter((m) => !vistos.has(m.path) && !fuera.has(m.path));
+  const final = [...pedidas, ...extras].slice(0, 30);
+  const { error } = await supabase.from("casos").update({ media: final }).eq("id", id);
+  if (error) throw new Error(error.message);
+  if (fuera.size) await supabase.storage.from("casos").remove([...fuera]);
   refrescar(id);
+  return final;
 }
 
 export async function borrarCaso(id: string) {

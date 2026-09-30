@@ -8,6 +8,7 @@ import { Media } from "@/components/Media";
 import { BorrarAvance } from "@/components/BorrarAvance";
 import { actualizarTrabajo } from "../../actions";
 import { crearCasoDesdeTrabajo } from "../../nuestros-clientes/actions";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function TrabajoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -99,7 +100,7 @@ export default async function TrabajoPage({ params }: { params: Promise<{ id: st
               <input type="checkbox" name="presupuesto_aprobado" defaultChecked={t.presupuesto_aprobado} /> Presupuesto aprobado por el cliente
             </label>
             <label className="field"><span>Notas internas (el cliente no las ve)</span><textarea name="notas_internas" rows={3} defaultValue={t.notas_internas ?? ""} /></label>
-            <button className="btn w-full">Guardar</button>
+            <BotonGuardar className="btn w-full" />
           </form>
         </aside>
       </div>
