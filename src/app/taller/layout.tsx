@@ -34,6 +34,7 @@ export default async function TallerLayout({ children }: { children: React.React
           <Link href="/taller/usados" className="muted hover:underline">Usados</Link>
           <Link href="/taller/consultas" className="muted hover:underline">Consultas</Link>
           <Link href="/taller/nuestros-clientes" className="muted hover:underline">Nuestros clientes</Link>
+          <Link href="/taller/imagenes" className="font-semibold hover:underline" style={{ color: "var(--accent)" }}>Imágenes</Link>
           {staff.rol === "admin" && <Link href="/taller/equipo" className="muted hover:underline">Equipo</Link>}
           {staff.rol === "admin" && <Link href="/taller/ajustes" className="muted hover:underline">Ajustes</Link>}
           <span className="ml-auto muted hidden sm:inline">

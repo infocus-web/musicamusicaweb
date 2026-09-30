@@ -24,8 +24,25 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
 
   const columnas = ESTADOS.filter((e) => todos || ESTADOS_ACTIVOS.includes(e.id));
 
+  const accesos = [
+    ["/taller/imagenes", "Imágenes de la web", "Banner, tarjetas y categorías"],
+    ["/taller/tienda", "Tienda", "Productos, precios y stock"],
+    ["/taller/usados", "Usados", "Publicar y marcar vendidos"],
+    ["/taller/pedidos", "Pedidos", "Compras de la tienda"],
+    ["/taller/consultas", "Consultas", "Tasaciones y presupuestos"],
+    ["/taller/clientes", "Clientes", "Alta, CSV y link de registro"],
+  ];
+
   return (
     <div className="space-y-6">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {accesos.map(([href, t, d]) => (
+          <Link key={href} href={href} className="card !p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+            <p className="font-semibold">{t}</p>
+            <p className="muted text-xs">{d}</p>
+          </Link>
+        ))}
+      </section>
       <div className="flex flex-wrap items-end gap-3">
         <div className="mr-auto">
           <h1 className="text-2xl font-semibold">Trabajos en el taller</h1>

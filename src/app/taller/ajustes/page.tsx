@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { obtenerStaff } from "@/lib/auth";
 import { obtenerAjustes } from "@/lib/ajustes";
 import { guardarAjustes } from "./actions";
-import { ImagenBanner } from "./ImagenBanner";
+import Link from "next/link";
 
 export default async function AjustesPage() {
   const { staff } = await obtenerStaff();
@@ -14,14 +14,9 @@ export default async function AjustesPage() {
         <h1 className="text-2xl font-semibold">Ajustes del sitio</h1>
         <p className="muted text-sm">Estos datos se usan en toda la web: botones de WhatsApp, pie de página, contacto, quiénes somos y términos.</p>
       </div>
-      <section className="card grid gap-3 sm:grid-cols-2">
-        <h2 className="font-semibold sm:col-span-2">Banner de la portada</h2>
-        <ImagenBanner inicial={a.hero_imagen} />
-        <label className="field sm:col-span-2"><span>Título</span><input name="hero_titulo" defaultValue={a.hero_titulo ?? ""} placeholder="Tu instrumento, en manos de luthiers." /></label>
-        <label className="field sm:col-span-2"><span>Bajada</span><input name="hero_texto" defaultValue={a.hero_texto ?? ""} placeholder="Calibración, reparación y puesta a punto. Seguí el avance online." /></label>
-        <label className="field"><span>Texto del botón</span><input name="hero_boton" defaultValue={a.hero_boton ?? ""} placeholder="Pedí tu service" /></label>
-        <label className="field"><span>Link del botón</span><input name="hero_link" defaultValue={a.hero_link ?? ""} placeholder="/asesor" /></label>
-      </section>
+      <p className="rounded-xl p-3 text-sm" style={{ background: "var(--soft)" }}>
+        Las fotos de la web (banner, tarjetas y categorías de la portada) se cargan en <Link href="/taller/imagenes" className="link font-semibold">Imágenes de la web</Link>.
+      </p>
       <section className="card grid gap-3 sm:grid-cols-2">
         <h2 className="font-semibold sm:col-span-2">Contacto</h2>
         <label className="field"><span>WhatsApp del taller</span><input name="whatsapp" defaultValue={a.whatsapp ?? ""} placeholder="11 2345 6789" inputMode="tel" /></label>

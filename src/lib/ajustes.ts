@@ -24,3 +24,9 @@ export function waTaller(numero: string | null, mensaje: string) {
   if (!n.startsWith("54")) n = "549" + n.replace(/^0/, "");
   return `https://wa.me/${n}?text=${encodeURIComponent(mensaje)}`;
 }
+
+/** Rutas de las fotos cargadas en "Imágenes de la web", por clave. */
+export const obtenerImagenesSitio = cache(async (): Promise<Record<string, string | null>> => {
+  const { data } = await createAdminClient().from("ajustes").select("clave, valor").or("clave.like.img_%,clave.eq.hero_imagen");
+  return Object.fromEntries((data ?? []).map((r) => [r.clave, r.valor]));
+});

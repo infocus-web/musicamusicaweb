@@ -9,7 +9,8 @@ import { Carrusel } from "@/components/Carrusel";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { datosNuestrosClientes } from "@/lib/nuestros-clientes";
 import { estrellas } from "@/lib/casos";
-import { obtenerAjustes } from "@/lib/ajustes";
+import { obtenerAjustes, obtenerImagenesSitio } from "@/lib/ajustes";
+import { urlSitio } from "@/lib/imagenes-sitio";
 import { fotoUsado, type Usado } from "@/lib/usados";
 import { fotoProducto, type Producto } from "@/lib/tienda";
 import { Asesor } from "./asesor/Asesor";
@@ -73,6 +74,7 @@ export default async function Home() {
     datosNuestrosClientes(3),
     obtenerAjustes(),
   ]);
+  const imgs = await obtenerImagenesSitio();
   const usados = (usadosData ?? []) as Usado[];
   const liquidacion = (liqData ?? []) as Usado[];
   const productos = (prodData ?? []) as Producto[];
@@ -80,20 +82,20 @@ export default async function Home() {
 
   // Foto de cada categoría: la del producto más nuevo de esa categoría (o del último usado).
   const fotoCat = (cat: string) =>
-    cat === "_usados" ? fotoUsado(usados[0]?.fotos[0]) : fotoProducto(productos.find((p) => p.categoria === cat && p.fotos.length)?.fotos[0]);
+    urlSitio(imgs[`img_cat_${cat}`]) ?? (cat === "_usados" ? fotoUsado(usados[0]?.fotos[0]) : fotoProducto(productos.find((p) => p.categoria === cat && p.fotos.length)?.fotos[0]));
 
   const hero = {
     titulo: a.hero_titulo || "Tu instrumento, en manos de luthiers.",
     texto: a.hero_texto || "Calibración, reparación y puesta a punto. Seguís el avance online, con fotos y videos de cada paso.",
     boton: a.hero_boton || "Pedí tu service",
     link: a.hero_link || "/asesor",
-    imagen: a.hero_imagen ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/sitio/${a.hero_imagen}` : null,
+    imagen: urlSitio(a.hero_imagen),
   };
 
   const tiles = [
-    { href: "/usados", titulo: "Usados revisados", bajada: "Pasan por nuestro banco antes de venderse", img: fotoUsado(usados[0]?.fotos[0]) },
-    { href: "/usados?seccion=liquidacion", titulo: "Liquidación", bajada: "Precios rebajados hasta agotar stock", img: fotoUsado(liquidacion[0]?.fotos[0]), rojo: true },
-    { href: "/tienda?cat=servicios", titulo: "Servicio del taller", bajada: "Puesta a punto, calibración y reparaciones", img: fotoProducto(productos.find((p) => p.tipo === "servicio" && p.fotos.length)?.fotos[0]) },
+    { href: "/usados", titulo: "Usados revisados", bajada: "Pasan por nuestro banco antes de venderse", img: urlSitio(imgs.img_tile_usados) ?? fotoUsado(usados[0]?.fotos[0]) },
+    { href: "/usados?seccion=liquidacion", titulo: "Liquidación", bajada: "Precios rebajados hasta agotar stock", img: urlSitio(imgs.img_tile_liquidacion) ?? fotoUsado(liquidacion[0]?.fotos[0]), rojo: true },
+    { href: "/tienda?cat=servicios", titulo: "Servicio del taller", bajada: "Puesta a punto, calibración y reparaciones", img: urlSitio(imgs.img_tile_servicio) ?? fotoProducto(productos.find((p) => p.tipo === "servicio" && p.fotos.length)?.fotos[0]) },
   ];
 
   return (
