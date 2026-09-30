@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { InputClave } from "@/components/InputClave";
 
 /** Cambia la clave del usuario logueado (personal o cliente). */
 export function FormCambiarClave({ minimo = 6 }: { minimo?: number }) {
@@ -25,8 +26,8 @@ export function FormCambiarClave({ minimo = 6 }: { minimo?: number }) {
 
   return (
     <form onSubmit={onSubmit} className="card space-y-3">
-      <label className="field"><span>Clave nueva</span><input name="clave" type="password" minLength={minimo} required autoComplete="new-password" /></label>
-      <label className="field"><span>Repetir clave</span><input name="repetir" type="password" minLength={minimo} required autoComplete="new-password" /></label>
+      <label className="field"><span>Clave nueva</span><InputClave name="clave" minLength={minimo} required autoComplete="new-password" /></label>
+      <label className="field"><span>Repetir clave</span><InputClave name="repetir" minLength={minimo} required autoComplete="new-password" /></label>
       {msg?.error && <p className="text-sm text-red-600">{msg.error}</p>}
       {msg?.ok && <p className="text-sm text-emerald-600">{msg.ok}</p>}
       <button className="btn w-full" disabled={pendiente}>{pendiente ? "Guardando…" : "Cambiar clave"}</button>

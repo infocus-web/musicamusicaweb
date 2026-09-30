@@ -7,6 +7,7 @@ import { SubirAvance } from "@/components/SubirAvance";
 import { Media } from "@/components/Media";
 import { BorrarAvance } from "@/components/BorrarAvance";
 import { actualizarTrabajo } from "../../actions";
+import { crearCasoDesdeTrabajo } from "../../nuestros-clientes/actions";
 
 export default async function TrabajoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,6 +48,9 @@ export default async function TrabajoPage({ params }: { params: Promise<{ id: st
           <div className="flex flex-wrap gap-2">
             <a className="btn" href={linkWhatsApp(t.clientes.telefono, aviso)} target="_blank" rel="noreferrer">Avisar por WhatsApp</a>
             <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver como cliente</a>
+            {["listo", "entregado"].includes(t.estado) && (
+              <form action={crearCasoDesdeTrabajo.bind(null, t.id)}><button className="btn-ghost">Mostrar en Nuestros clientes</button></form>
+            )}
           </div>
 
           <h2 className="font-semibold">Avances</h2>

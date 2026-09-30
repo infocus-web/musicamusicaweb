@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { ingresar } from "./actions";
 import { Logo } from "@/components/Logo";
+import { InputClave } from "@/components/InputClave";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(ingresar, undefined);
@@ -19,7 +20,7 @@ export default function LoginPage() {
         </label>
         <label className="field">
           <span>Contraseña</span>
-          <input name="password" type="password" required autoComplete="current-password" />
+          <InputClave name="password" required autoComplete="current-password" />
         </label>
         {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
         <button className="btn w-full" disabled={pending}>

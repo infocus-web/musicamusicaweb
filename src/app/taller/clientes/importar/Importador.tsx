@@ -97,7 +97,7 @@ export function Importador() {
         </label>
         <p className="muted text-sm">
           Columnas reconocidas: <b>nombre</b> (obligatoria), teléfono, email, notas y, si querés cargar su instrumento, instrumento, marca, modelo y n° de serie.
-          Sirve el CSV que guarda Excel o Google Sheets (separado por <code>;</code> o <code>,</code>).{" "}
+          Sirve el CSV de Excel o Google Sheets (separado por <code>;</code> o <code>,</code>) y el que exporta Contactos de Google.{" "}
           <a href="/plantilla-clientes.csv" download className="link">Descargar plantilla</a>
         </p>
         {error && <p className="text-sm text-red-600">{error}</p>}

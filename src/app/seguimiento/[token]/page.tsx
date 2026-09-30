@@ -26,7 +26,7 @@ export default async function SeguimientoPage({ params }: { params: Promise<{ to
         <p className="muted text-sm">Código de cliente <span className="font-mono">{cliente.codigo}</span></p>
       </header>
 
-      <TrabajosCliente clienteId={cliente.id} />
+      <TrabajosCliente clienteId={cliente.id} token={token} />
 
       <footer className="muted text-center text-xs">Este link es personal. No lo compartas.</footer>
     </main>

@@ -39,10 +39,10 @@ export function parsearCSV(texto: string): string[][] {
 }
 
 const SINONIMOS: Record<string, string[]> = {
-  nombre: ["nombre", "cliente", "nombre y apellido", "apellido y nombre", "nombre completo", "razon social"],
-  telefono: ["telefono", "tel", "celular", "cel", "whatsapp", "movil", "telefono celular"],
-  email: ["email", "e-mail", "mail", "correo", "correo electronico"],
-  notas: ["notas", "nota", "observaciones", "obs", "comentarios"],
+  nombre: ["nombre", "cliente", "nombre y apellido", "apellido y nombre", "nombre completo", "razon social", "name", "display name", "full name"],
+  telefono: ["telefono", "tel", "celular", "cel", "whatsapp", "movil", "telefono celular", "phone 1 - value", "mobile phone", "phone", "primary phone", "telefono movil"],
+  email: ["email", "e-mail", "mail", "correo", "correo electronico", "e-mail 1 - value", "email address", "e-mail address"],
+  notas: ["notas", "nota", "observaciones", "obs", "comentarios", "notes"],
   tipo: ["instrumento", "tipo", "tipo de instrumento"],
   marca: ["marca"],
   modelo: ["modelo"],
@@ -72,10 +72,21 @@ export function mapearClientes(filas: string[][]): { clientes: FilaCliente[]; co
     if (campo && indice[campo] === undefined) { indice[campo] = i; columnas[campo] = h.trim(); }
     else if (h.trim()) ignoradas.push(h.trim());
   });
+  // Contactos de Google / Outlook: nombre y apellido vienen en columnas separadas.
+  const pos = (...nombres: string[]) => encabezado.findIndex((h) => nombres.includes(normalizar(h)));
+  const iNombre = pos("first name", "given name", "nombre de pila");
+  const iSegundo = pos("middle name", "additional name");
+  const iApellido = pos("last name", "family name", "apellido");
+  if (indice.nombre === undefined && (iNombre >= 0 || iApellido >= 0)) columnas.nombre = "nombre + apellido";
+
+  // "+54 9 11 1234-5678 ::: +54 11 ..." → nos quedamos con el primero.
+  const primero = (t: string) => t.split(/\s*:::\s*/)[0].trim();
+
   const clientes = datos.map((f) => {
     const v = (c: keyof FilaCliente) => (indice[c] !== undefined ? (f[indice[c]!] ?? "").trim() : "");
+    const partes = [iNombre, iSegundo, iApellido].map((i) => (i >= 0 ? (f[i] ?? "").trim() : "")).filter(Boolean);
     return {
-      nombre: v("nombre"), telefono: v("telefono"), email: v("email").toLowerCase(), notas: v("notas"),
+      nombre: v("nombre") || partes.join(" "), telefono: primero(v("telefono")), email: primero(v("email")).toLowerCase(), notas: v("notas"),
       tipo: v("tipo"), marca: v("marca"), modelo: v("modelo"), numero_serie: v("numero_serie"),
     };
   });

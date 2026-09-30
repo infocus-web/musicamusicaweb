@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { cambiarClaveIntegrante, cambiarRol, quitarAcceso } from "./actions";
+import { InputClave } from "@/components/InputClave";
 
 type Props = { userId: string; nombre: string | null; email: string | null; rol: string; esYo: boolean };
 
@@ -42,7 +43,7 @@ export function FilaIntegrante({ userId, nombre, email, rol, esYo }: Props) {
       </div>
       {abierto && (
         <form action={accion} className="flex flex-wrap items-end gap-2">
-          <label className="field flex-1"><span>Clave nueva (mín. 8)</span><input name="clave" type="text" minLength={8} required autoComplete="new-password" /></label>
+          <label className="field flex-1"><span>Clave nueva (mín. 8)</span><InputClave name="clave" minLength={8} required autoComplete="new-password" /></label>
           <button className="btn" disabled={pendiente}>Guardar clave</button>
           {estado?.error && <p className="w-full text-sm text-red-600">{estado.error}</p>}
           {estado?.ok && <p className="w-full text-sm text-emerald-600">{estado.ok}</p>}

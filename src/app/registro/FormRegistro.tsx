@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { registrarCliente } from "./actions";
 import { TIPOS_INSTRUMENTO } from "@/lib/estados";
+import { InputClave } from "@/components/InputClave";
 
 export function FormRegistro() {
   const [estado, accion, pendiente] = useActionState(registrarCliente, undefined);
@@ -73,7 +74,7 @@ export function FormRegistro() {
 
       <fieldset className="space-y-3 border-t pt-4" style={{ borderColor: "var(--line)" }}>
         <legend className="font-semibold">Clave para Mi cuenta (opcional)</legend>
-        <label className="field"><span>Elegí una clave (mín. 6)</span><input name="clave" type="password" minLength={6} autoComplete="new-password" /></label>
+        <label className="field"><span>Elegí una clave (mín. 6)</span><InputClave name="clave" minLength={6} autoComplete="new-password" /></label>
         <p className="muted text-xs">Si no la cargás, igual te damos un link privado para seguir tus trabajos.</p>
       </fieldset>
 

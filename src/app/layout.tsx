@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Música Música Web — Taller de instrumentos",
@@ -12,7 +15,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-AR">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} antialiased`}>
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

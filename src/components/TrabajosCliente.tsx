@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ESTADOS, estadoInfo, formatoFecha, formatoFechaHora, formatoPesos } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { Media } from "@/components/Media";
+import { FormResena } from "@/components/FormResena";
 
 // Pasos que ve el cliente en la barra de progreso
 const PASOS = ["recibido", "en_revision", "en_trabajo", "listo", "entregado"];
@@ -18,7 +19,7 @@ function pasoActual(estado: string) {
  * Se usa en el link privado (/seguimiento/[token]) y en Mi cuenta (/mi-cuenta).
  * Solo servidor: lee con service role, así que quien lo llama ya validó al cliente.
  */
-export async function TrabajosCliente({ clienteId }: { clienteId: string }) {
+export async function TrabajosCliente({ clienteId, token = null }: { clienteId: string; token?: string | null }) {
   const db = createAdminClient();
   const { data: trabajos } = await db
     .from("trabajos")
@@ -36,6 +37,9 @@ export async function TrabajosCliente({ clienteId }: { clienteId: string }) {
         .eq("visible_cliente", true)
         .order("creado_en", { ascending: false })
     : { data: [] };
+
+  const { data: resenas } = ids.length ? await db.from("resenas").select("trabajo_id").in("trabajo_id", ids) : { data: [] };
+  const conResena = new Set((resenas ?? []).map((r) => r.trabajo_id));
 
   const paths = (avances ?? []).map((a) => a.media_path).filter(Boolean) as string[];
   const firmadas = paths.length ? (await db.storage.from("avances").createSignedUrls(paths, 60 * 60 * 3)).data ?? [] : [];
@@ -102,6 +106,7 @@ export async function TrabajosCliente({ clienteId }: { clienteId: string }) {
                 </ol>
               </div>
             )}
+            {["listo", "entregado"].includes(t.estado) && !conResena.has(t.id) && <FormResena trabajoId={t.id} token={token} />}
           </section>
         );
       })}

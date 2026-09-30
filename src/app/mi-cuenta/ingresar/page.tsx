@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { ingresarCliente } from "../actions";
 import { Logo } from "@/components/Logo";
+import { InputClave } from "@/components/InputClave";
 
 export default function IngresarClientePage() {
   const [estado, accion, pendiente] = useActionState(ingresarCliente, undefined);
@@ -21,7 +22,7 @@ export default function IngresarClientePage() {
         </label>
         <label className="field">
           <span>Clave</span>
-          <input name="clave" type="password" required autoComplete="current-password" />
+          <InputClave name="clave" required autoComplete="current-password" />
         </label>
         {estado?.error && <p className="text-sm text-red-600">{estado.error}</p>}
         <button className="btn w-full" disabled={pendiente}>{pendiente ? "Ingresando…" : "Ingresar"}</button>
