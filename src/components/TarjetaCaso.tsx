@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { estrellas, urlCaso, type Caso, type Resena } from "@/lib/casos";
+import { Videos } from "@/components/Videos";
 
 export function TarjetaCaso({ c, r }: { c: Caso; r?: Resena | null }) {
   const fotos = c.media.filter((m) => m.tipo === "foto");
@@ -29,6 +30,7 @@ export function TarjetaCaso({ c, r }: { c: Caso; r?: Resena | null }) {
         </div>
         <h3 className="font-semibold">{c.titulo}</h3>
         {c.descripcion && <p className="muted whitespace-pre-line text-sm">{c.descripcion}</p>}
+        {(c.videos ?? []).length > 0 && <Videos links={c.videos} columnas={1} />}
         {video && antes && (
           <details className="text-sm"><summary className="link cursor-pointer">Ver video</summary>
             <video src={urlCaso(video.path)} controls playsInline preload="none" className="mt-2 w-full rounded-lg bg-black" />

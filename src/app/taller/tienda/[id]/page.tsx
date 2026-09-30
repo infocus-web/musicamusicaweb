@@ -5,6 +5,7 @@ import { CATEGORIAS_TIENDA, type Producto } from "@/lib/tienda";
 import { EditorFotos } from "@/components/EditorFotos";
 import { borrarProducto, guardarFotosProducto, guardarProducto } from "../actions";
 import { Variantes } from "./Variantes";
+import { CampoVideos } from "@/components/CampoVideos";
 
 export default async function EditarProductoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -42,6 +43,7 @@ export default async function EditarProductoPage({ params }: { params: Promise<{
           </div>
           <Variantes iniciales={vs.map((v) => ({ id: v.id, nombre: v.nombre, precio: v.precio, stock: v.stock }))} />
           <label className="field sm:col-span-2"><span>Descripción</span><textarea name="descripcion" rows={6} defaultValue={p.descripcion ?? ""} /></label>
+          <CampoVideos inicial={p.videos ?? []} className="sm:col-span-2" />
           <div className="flex flex-wrap gap-4 text-sm sm:col-span-2">
             <label className="flex items-center gap-2"><input type="checkbox" name="activo" defaultChecked={p.activo} /> Publicado en la tienda</label>
             <label className="flex items-center gap-2"><input type="checkbox" name="destacado" defaultChecked={p.destacado} /> Destacado</label>

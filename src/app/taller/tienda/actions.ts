@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIAS_TIENDA, slugify } from "@/lib/tienda";
+import { limpiarVideos } from "@/lib/video";
 
 const txt = (fd: FormData, k: string, max = 5000) => { const s = String(fd.get(k) ?? "").trim().slice(0, max); return s === "" ? null : s; };
 const num = (v: FormDataEntryValue | null | string) => {
@@ -52,6 +53,7 @@ export async function guardarProducto(id: string, fd: FormData) {
     stock: Math.round(num(fd.get("stock")) ?? 0),
     sin_stock_vende: fd.get("sin_stock_vende") === "on",
     activo: fd.get("activo") === "on", destacado: fd.get("destacado") === "on",
+    videos: limpiarVideos(String(fd.get("videos") ?? "")),
   }).eq("id", id);
   if (error) throw new Error(error.message);
 

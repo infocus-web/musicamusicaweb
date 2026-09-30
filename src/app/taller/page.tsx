@@ -25,7 +25,7 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
   const columnas = ESTADOS.filter((e) => todos || ESTADOS_ACTIVOS.includes(e.id));
 
   const accesos = [
-    ["/taller/imagenes", "Imágenes de la web", "Banner, tarjetas y categorías"],
+    ["/taller/imagenes", "Imágenes y videos", "Banner, categorías y videos"],
     ["/taller/tienda", "Tienda", "Productos, precios y stock"],
     ["/taller/usados", "Usados", "Publicar y marcar vendidos"],
     ["/taller/pedidos", "Pedidos", "Compras de la tienda"],

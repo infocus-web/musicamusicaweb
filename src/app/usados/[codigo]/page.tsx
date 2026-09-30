@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Galeria } from "@/components/Galeria";
 import { Compartir } from "@/components/Compartir";
 import { AgregarAlCarrito } from "@/components/AgregarAlCarrito";
+import { Videos } from "@/components/Videos";
 
 export const revalidate = 60;
 
@@ -115,6 +116,13 @@ export default async function UsadoPage({ params }: { params: Promise<{ codigo: 
             </dl>
           </section>
         </div>
+
+        {(u.videos ?? []).length > 0 && (
+          <section className="space-y-3">
+            <h2 className="titulo text-2xl">Videos</h2>
+            <Videos links={u.videos} />
+          </section>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           {u.descripcion && (

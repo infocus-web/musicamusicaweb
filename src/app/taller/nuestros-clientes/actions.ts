@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { obtenerStaff } from "@/lib/auth";
 import type { MediaCaso } from "@/lib/casos";
+import { limpiarVideos } from "@/lib/video";
 
 function refrescar(id?: string) {
   revalidatePath("/taller/nuestros-clientes");
@@ -62,6 +63,7 @@ export async function guardarCaso(id: string, fd: FormData) {
   const { error } = await supabase.from("casos").update({
     titulo: s("titulo") ?? "Trabajo", instrumento: s("instrumento"), servicio: s("servicio"), descripcion: s("descripcion"),
     resena_id: s("resena_id"), publicado: fd.get("publicado") === "on", orden: Number(fd.get("orden")) || 0,
+    videos: limpiarVideos(String(fd.get("videos") ?? "")),
   }).eq("id", id);
   if (error) throw new Error(error.message);
   refrescar(id);

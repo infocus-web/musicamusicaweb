@@ -7,8 +7,9 @@ export type Ajustes = {
   email: string | null; quienes_somos: string | null; terminos: string | null;
   transferencia_datos: string | null; transferencia_descuento: string | null;
   hero_titulo: string | null; hero_texto: string | null; hero_boton: string | null; hero_link: string | null; hero_imagen: string | null;
+  videos_portada: string | null;
 };
-export const CLAVES_AJUSTES = ["whatsapp", "email", "direccion", "horarios", "instagram", "quienes_somos", "terminos", "transferencia_datos", "transferencia_descuento", "hero_titulo", "hero_texto", "hero_boton", "hero_link", "hero_imagen"] as const;
+export const CLAVES_AJUSTES = ["whatsapp", "email", "direccion", "horarios", "instagram", "quienes_somos", "terminos", "transferencia_datos", "transferencia_descuento", "hero_titulo", "hero_texto", "hero_boton", "hero_link", "hero_imagen", "videos_portada"] as const;
 
 /** Datos de contacto del taller (se editan en /taller/ajustes). */
 export const obtenerAjustes = cache(async (): Promise<Ajustes> => {

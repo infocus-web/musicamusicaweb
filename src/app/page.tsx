@@ -15,6 +15,7 @@ import { fotoUsado, type Usado } from "@/lib/usados";
 import { fotoProducto, type Producto } from "@/lib/tienda";
 import { Asesor } from "./asesor/Asesor";
 import { IconoCategoria } from "@/components/IconoCategoria";
+import { Videos } from "@/components/Videos";
 
 export const revalidate = 120;
 
@@ -199,6 +200,13 @@ export default async function Home() {
               <Titulo sub="Cada uno pasa por nuestro banco de trabajo antes de publicarse.">Usados revisados</Titulo>
               <Carrusel>{usados.map((u) => <TarjetaUsado key={u.id} u={u} />)}</Carrusel>
               <div className="text-center"><Link href="/usados" className="btn-rojo">Ver todos los usados</Link></div>
+            </section>
+          )}
+
+          {a.videos_portada && (
+            <section className="space-y-6">
+              <Titulo sub="Mirá cómo trabajamos en el banco del taller.">Videos del taller</Titulo>
+              <Videos links={a.videos_portada.split("\n").filter(Boolean)} columnas={3} />
             </section>
           )}
 

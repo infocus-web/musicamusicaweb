@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Galeria } from "@/components/Galeria";
 import { AgregarAlCarrito } from "@/components/AgregarAlCarrito";
 import { Compartir } from "@/components/Compartir";
+import { Videos } from "@/components/Videos";
 
 export const revalidate = 60;
 
@@ -66,6 +67,12 @@ export default async function ProductoPage({ params }: { params: Promise<{ slug:
             {p.sku && <p className="muted text-xs">Código: {p.sku}</p>}
           </section>
         </div>
+        {(p.videos ?? []).length > 0 && (
+          <section className="space-y-3">
+            <h2 className="titulo text-2xl">Videos</h2>
+            <Videos links={p.videos} />
+          </section>
+        )}
         {p.descripcion && (
           <section className="card space-y-2">
             <h2 className="font-semibold">Descripción</h2>

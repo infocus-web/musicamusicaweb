@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { estrellas, type Caso, type Resena } from "@/lib/casos";
 import { borrarCaso, guardarCaso } from "../actions";
 import { MediaEditor } from "./MediaEditor";
+import { CampoVideos } from "@/components/CampoVideos";
 
 export default async function EditarCasoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,6 +26,7 @@ export default async function EditarCasoPage({ params }: { params: Promise<{ id:
           <label className="field"><span>Instrumento</span><input name="instrumento" defaultValue={c.instrumento ?? ""} /></label>
           <label className="field"><span>Servicio</span><input name="servicio" defaultValue={c.servicio ?? ""} /></label>
           <label className="field sm:col-span-2"><span>Qué hicimos (se muestra en la web)</span><textarea name="descripcion" rows={5} defaultValue={c.descripcion ?? ""} placeholder="Llegó con los trastes gastados y zumbido en las cuerdas graves. Hicimos nivelado y coronado…" /></label>
+          <CampoVideos inicial={c.videos ?? []} className="sm:col-span-2" />
           <label className="field sm:col-span-2"><span>Opinión del cliente</span>
             <select name="resena_id" defaultValue={c.resena_id ?? ""}>
               <option value="">Sin opinión</option>

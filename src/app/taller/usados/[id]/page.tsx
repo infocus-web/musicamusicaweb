@@ -5,6 +5,7 @@ import { CATEGORIAS_USADOS, CONDICIONES, ESTADOS_USADO, SECCIONES, estadoUsadoIn
 import { cambiarEstadoUsado, guardarUsado } from "../actions";
 import { Fotos } from "./Fotos";
 import { BorrarUsado } from "./BorrarUsado";
+import { CampoVideos } from "@/components/CampoVideos";
 
 export default async function EditarUsadoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -62,6 +63,7 @@ export default async function EditarUsadoPage({ params }: { params: Promise<{ id
           <label className="field col-span-2"><span>Descripción</span><textarea name="descripcion" rows={4} defaultValue={u.descripcion ?? ""} /></label>
           <label className="field col-span-2"><span>Características (una por línea)</span><textarea name="caracteristicas" rows={4} defaultValue={u.caracteristicas ?? ""} placeholder={"Cuerpo de aliso\nMástil de maple\nPastillas originales"} /></label>
           <label className="field col-span-2"><span>Qué le hicimos en el taller (una por línea)</span><textarea name="revision" rows={4} defaultValue={u.revision ?? ""} placeholder={"Calibración completa\nLimpieza de potes\nCuerdas nuevas"} /></label>
+          <CampoVideos inicial={u.videos ?? []} className="col-span-2" />
           <label className="field col-span-2"><span>Incluye (una por línea)</span><textarea name="incluye" rows={2} defaultValue={u.incluye ?? ""} placeholder={"Estuche rígido original"} /></label>
           <div className="col-span-2 flex items-center justify-between gap-3">
             <BorrarUsado id={u.id} />

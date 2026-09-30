@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIAS_USADOS, CONDICIONES, SECCIONES } from "@/lib/usados";
+import { limpiarVideos } from "@/lib/video";
 
 const txt = (fd: FormData, k: string, max = 5000) => {
   const s = String(fd.get(k) ?? "").trim().slice(0, max);
@@ -58,6 +59,7 @@ export async function guardarUsado(id: string, fd: FormData) {
     envio: fd.get("envio") === "on",
     destacado: fd.get("destacado") === "on",
     venta_online: fd.get("venta_online") === "on",
+    videos: limpiarVideos(String(fd.get("videos") ?? "")),
     estado,
   };
   if (estado === "publicado" && previo?.estado !== "publicado") cambios.publicado_en = new Date().toISOString();

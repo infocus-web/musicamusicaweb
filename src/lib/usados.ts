@@ -40,7 +40,7 @@ export type Usado = {
   descripcion: string | null; caracteristicas: string | null; incluye: string | null; revision: string | null;
   garantia_dias: number | null; acepta_permuta: boolean; envio: boolean; destacado: boolean;
   estado: "borrador" | "publicado" | "reservado" | "vendido"; fotos: string[];
-  seccion: SeccionId; precio_anterior: number | null; venta_online: boolean;
+  seccion: SeccionId; precio_anterior: number | null; venta_online: boolean; videos: string[];
   publicado_en: string | null; vendido_en: string | null; creado_en: string; actualizado_en: string;
 };
 

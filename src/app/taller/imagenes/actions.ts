@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { obtenerStaff } from "@/lib/auth";
 import { SLOTS } from "@/lib/imagenes-sitio";
+import { limpiarVideos } from "@/lib/video";
 
 /** Guarda (o quita) la foto de un lugar de la web y borra la anterior del bucket. */
 export async function guardarImagenSitio(slotId: string, path: string | null) {
@@ -28,5 +29,13 @@ export async function guardarTextosBanner(fd: FormData) {
     return { clave, valor: v || null, actualizado_en: new Date().toISOString() };
   });
   await createAdminClient().from("ajustes").upsert(filas);
+  revalidatePath("/", "layout");
+}
+
+export async function guardarVideosPortada(fd: FormData) {
+  const { staff } = await obtenerStaff();
+  if (!staff) throw new Error("Sin permiso");
+  const links = limpiarVideos(String(fd.get("videos") ?? ""));
+  await createAdminClient().from("ajustes").upsert({ clave: "videos_portada", valor: links.join("\n") || null, actualizado_en: new Date().toISOString() });
   revalidatePath("/", "layout");
 }

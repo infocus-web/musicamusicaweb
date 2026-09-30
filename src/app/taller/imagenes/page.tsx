@@ -2,7 +2,8 @@ import Link from "next/link";
 import { obtenerAjustes, obtenerImagenesSitio } from "@/lib/ajustes";
 import { SLOTS } from "@/lib/imagenes-sitio";
 import { SlotImagen } from "./SlotImagen";
-import { guardarTextosBanner } from "./actions";
+import { guardarTextosBanner, guardarVideosPortada } from "./actions";
+import { CampoVideos } from "@/components/CampoVideos";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export default async function ImagenesPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end gap-3">
         <div className="mr-auto">
-          <h1 className="text-2xl font-semibold">Imágenes de la web</h1>
+          <h1 className="text-2xl font-semibold">Imágenes y videos de la web</h1>
           <p className="muted text-sm">Tocá o arrastrá una foto sobre cada recuadro: se achica sola y se publica al instante.</p>
         </div>
         <Link href="/" target="_blank" className="btn-ghost">Ver la web</Link>
@@ -39,7 +40,16 @@ export default async function ImagenesPage() {
       ))}
 
       <section className="card space-y-3">
-        <h2 className="text-lg font-semibold">Fotos de productos, usados y trabajos</h2>
+        <h2 className="text-lg font-semibold">Videos del taller (portada)</h2>
+        <p className="muted text-sm">Pegá los links de YouTube (también sirven Instagram, TikTok o Vimeo). Aparecen en la portada en la sección “Videos del taller”, en el mismo orden.</p>
+        <form action={guardarVideosPortada} className="space-y-3">
+          <CampoVideos inicial={(a.videos_portada ?? "").split("\n").filter(Boolean)} />
+          <button className="btn">Guardar videos</button>
+        </form>
+      </section>
+
+      <section className="card space-y-3">
+        <h2 className="text-lg font-semibold">Fotos y videos de productos, usados y trabajos</h2>
         <p className="muted text-sm">Esas fotos se cargan dentro de cada uno:</p>
         <div className="grid gap-3 sm:grid-cols-3">
           {[

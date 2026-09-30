@@ -22,6 +22,7 @@ export type Producto = {
   descripcion: string | null; precio: number; precio_anterior: number | null; stock: number; sin_stock_vende: boolean;
   fotos: string[]; activo: boolean; destacado: boolean; sku: string | null; creado_en: string; actualizado_en: string;
   variantes?: Variante[];
+  videos: string[];
 };
 
 export const fotoProducto = (path?: string | null) =>
