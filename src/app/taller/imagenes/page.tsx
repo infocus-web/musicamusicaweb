@@ -21,6 +21,14 @@ export default async function ImagenesPage() {
         <Link href="/" target="_blank" className="btn-ghost">Ver la web</Link>
       </div>
 
+      <Link href="/taller/usados" className="flex flex-wrap items-center gap-3 rounded-xl border-2 p-4" style={{ borderColor: "var(--accent)", background: "color-mix(in srgb, var(--accent) 6%, white)" }}>
+        <div className="flex-1">
+          <p className="font-semibold">¿Querés publicar un usado con varias fotos?</p>
+          <p className="muted text-sm">Esta página es para las fotos fijas de la portada (una por recuadro). Cada instrumento usado se carga en <b>Usados → + Cargar</b>, y ahí podés subir todas las fotos que quieras de una vez.</p>
+        </div>
+        <span className="btn">Ir a Usados →</span>
+      </Link>
+
       {grupos.map((g) => (
         <section key={g} className="card space-y-4">
           <h2 className="text-lg font-semibold">{g}</h2>

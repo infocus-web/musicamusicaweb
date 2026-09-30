@@ -8,7 +8,7 @@ const CATS: [string, string][] = [
 
 export const SLOTS: Slot[] = [
   { id: "hero", clave: "hero_imagen", grupo: "Portada", titulo: "Banner principal", ayuda: "Foto horizontal (ideal 2000 × 900): el taller, tu banco de trabajo, un instrumento.", ratio: "21/9" },
-  { id: "tile_usados", clave: "img_tile_usados", grupo: "Tarjetas debajo del banner", titulo: "Usados revisados", ayuda: "Horizontal. Si no cargás nada, se usa la foto del último usado.", ratio: "16/9" },
+  { id: "tile_usados", clave: "img_tile_usados", grupo: "Tarjetas debajo del banner", titulo: "Usados revisados", ayuda: "Una sola foto de portada para esta tarjeta. Las fotos de cada usado a la venta se cargan en Usados.", ratio: "16/9" },
   { id: "tile_liquidacion", clave: "img_tile_liquidacion", grupo: "Tarjetas debajo del banner", titulo: "Liquidación", ayuda: "Horizontal. Si no cargás nada, se usa la del último en liquidación.", ratio: "16/9" },
   { id: "tile_servicio", clave: "img_tile_servicio", grupo: "Tarjetas debajo del banner", titulo: "Servicio del taller", ayuda: "Horizontal: el taller trabajando.", ratio: "16/9" },
   ...CATS.map(([id, t]) => ({ id: `cat_${id}`, clave: `img_cat_${id}`, grupo: "Categorías populares", titulo: t, ayuda: "Cuadrada, producto sobre fondo blanco.", ratio: "1/1" })),

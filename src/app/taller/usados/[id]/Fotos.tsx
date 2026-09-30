@@ -50,7 +50,7 @@ export function Fotos({ id, iniciales }: { id: string; iniciales: string[] }) {
           <input type="file" accept="image/*" multiple className="hidden" onChange={subir} />
         </label>
       </div>
-      <p className="muted text-xs">La primera es la portada. Se achican solas antes de subir.</p>
+      <p className="muted text-xs">Podés elegir varias fotos a la vez (hasta 20). La primera es la portada; ordenalas con las flechas. Se achican solas antes de subir.</p>
       {msg && <p className="text-sm">{msg}</p>}
       {fotos.length === 0 && <p className="muted text-sm">Todavía no hay fotos.</p>}
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">

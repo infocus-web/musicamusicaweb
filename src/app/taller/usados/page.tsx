@@ -42,7 +42,12 @@ export default async function UsadosTallerPage({ searchParams }: { searchParams:
         {SECCIONES.map((s) => <Link key={s.id} href={link({ seccion: s.id })} className={seccion === s.id ? "btn !py-1" : "btn-ghost !py-1"}>{s.label}</Link>)}
       </div>
 
-      {usados.length === 0 && <p className="card muted">No hay nada cargado con ese filtro.</p>}
+      {usados.length === 0 && (
+        <div className="card space-y-2">
+          <p className="font-semibold">{estado || seccion ? "No hay nada cargado con ese filtro." : "Todavía no cargaste ningún usado."}</p>
+          <p className="muted text-sm">Elegí la sección arriba a la derecha y tocá <b>+ Cargar</b>. Se abre la ficha del usado: completás los datos y en el recuadro <b>Fotos</b> tocás <b>+ Agregar fotos</b> y elegís todas las fotos juntas (en el celular, mantené apretada una y marcá las demás). Cuando esté listo, tocá <b>Publicar</b>.</p>
+        </div>
+      )}
       <ul className="grid gap-3 md:grid-cols-2">
         {usados.map((u) => {
           const e = estadoUsadoInfo(u.estado);
