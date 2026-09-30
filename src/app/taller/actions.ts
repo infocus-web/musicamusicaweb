@@ -140,3 +140,54 @@ export async function borrarAvance(id: string, trabajoId: string) {
   if (error) throw new Error(error.message);
   revalidatePath(`/taller/trabajos/${trabajoId}`);
 }
+
+/**
+ * Crea (o renueva) la clave de un cliente para entrar en /mi-cuenta con su código.
+ * Devuelve la clave UNA sola vez para mandársela por WhatsApp.
+ */
+export async function generarClaveCliente(
+  clienteId: string,
+  _prev: { clave?: string; error?: string } | undefined,
+): Promise<{ clave?: string; error?: string }> {
+  const { obtenerStaff, emailCliente, generarClave } = await import("@/lib/auth");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { staff } = await obtenerStaff();
+  if (!staff) return { error: "Sin permiso." };
+
+  const admin = createAdminClient();
+  const { data: c } = await admin.from("clientes").select("id, codigo, nombre, user_id").eq("id", clienteId).single();
+  if (!c) return { error: "Cliente no encontrado." };
+
+  const clave = generarClave();
+  if (c.user_id) {
+    const { error } = await admin.auth.admin.updateUserById(c.user_id, { password: clave, ban_duration: "none" });
+    if (error) return { error: error.message };
+  } else {
+    const { data, error } = await admin.auth.admin.createUser({
+      email: emailCliente(c.codigo),
+      password: clave,
+      email_confirm: true,
+      user_metadata: { tipo: "cliente", codigo: c.codigo, nombre: c.nombre },
+    });
+    if (error || !data.user) return { error: error?.message ?? "No se pudo crear el acceso." };
+    const { error: e2 } = await admin.from("clientes").update({ user_id: data.user.id }).eq("id", c.id);
+    if (e2) return { error: e2.message };
+  }
+  revalidatePath(`/taller/clientes/${clienteId}`);
+  return { clave };
+}
+
+/** Bloquea el acceso con clave del cliente (el link privado sigue funcionando). */
+export async function bloquearAccesoCliente(clienteId: string) {
+  const { obtenerStaff } = await import("@/lib/auth");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { staff } = await obtenerStaff();
+  if (!staff) throw new Error("Sin permiso.");
+  const admin = createAdminClient();
+  const { data: c } = await admin.from("clientes").select("user_id").eq("id", clienteId).single();
+  if (c?.user_id) {
+    await admin.auth.admin.deleteUser(c.user_id);
+    await admin.from("clientes").update({ user_id: null }).eq("id", clienteId);
+  }
+  revalidatePath(`/taller/clientes/${clienteId}`);
+}

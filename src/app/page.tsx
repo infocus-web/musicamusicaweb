@@ -12,8 +12,9 @@ const SERVICIOS = [
 export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-4">
-      <header className="flex items-center justify-end py-5">
-        <Link href="/login" className="muted text-sm hover:underline">Acceso taller</Link>
+      <header className="flex items-center justify-end gap-5 py-5 text-sm">
+        <Link href="/mi-cuenta" className="hover:underline">Mi cuenta</Link>
+        <Link href="/login" className="muted hover:underline">Acceso taller</Link>
       </header>
 
       <section className="grid items-center gap-10 py-10 sm:py-16 lg:grid-cols-[1.1fr_1fr]">
@@ -46,7 +47,8 @@ export default function Home() {
 
       <section className="card mb-16 space-y-2">
         <h2 className="text-xl font-semibold">¿Ya dejaste tu instrumento?</h2>
-        <p className="muted">Abrí el link que te mandamos por WhatsApp para ver en qué etapa está y los videos del trabajo.</p>
+        <p className="muted">Abrí el link que te mandamos por WhatsApp, o entrá con tu código de cliente y tu clave para ver en qué etapa está y los videos del trabajo.</p>
+        <Link href="/mi-cuenta" className="btn mt-2">Entrar a mi cuenta</Link>
       </section>
 
       <footer className="muted border-t py-6 text-sm" style={{ borderColor: "var(--line)" }}>

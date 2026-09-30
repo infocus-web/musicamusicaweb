@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SERVICIOS, TIPOS_INSTRUMENTO, formatoFecha, linkSeguimiento, linkWhatsApp } from "@/lib/estados";
+import { SERVICIOS, TIPOS_INSTRUMENTO, formatoFecha, linkSeguimiento, linkWhatsApp, siteUrl } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { CopiarLink } from "@/components/CopiarLink";
+import { AccesoCliente } from "@/components/AccesoCliente";
 import { actualizarCliente, crearInstrumento, crearTrabajo, regenerarLink } from "../../actions";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +44,15 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
           </form>
         </div>
       </section>
+
+      <AccesoCliente
+        clienteId={c.id}
+        codigo={c.codigo}
+        nombre={c.nombre}
+        telefono={c.telefono}
+        tieneAcceso={!!c.user_id}
+        urlCuenta={`${siteUrl()}/mi-cuenta`}
+      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="card space-y-4">
