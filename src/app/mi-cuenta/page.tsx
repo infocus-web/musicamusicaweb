@@ -22,12 +22,15 @@ export default async function MiCuentaPage({ searchParams }: { searchParams: Pro
     .from("clientes").select("id, nombre, codigo").eq("user_id", user.id).maybeSingle();
 
   if (!cliente) {
+    // Personal del taller: su lugar es el panel.
+    const { data: staff } = await supabase.from("staff").select("user_id").eq("user_id", user.id).maybeSingle();
+    if (staff) redirect("/taller");
     return (
       <main className="min-h-screen grid place-items-center px-4">
         <div className="card max-w-sm space-y-3">
           <h1 className="text-xl font-semibold">Esta cuenta no es de cliente</h1>
-          <p className="muted text-sm">Si sos del taller, entrá al <Link className="link" href="/taller">panel del taller</Link>.</p>
-          <form action={salirCliente}><button className="btn-ghost">Salir</button></form>
+          <p className="muted text-sm">Salí y volvé a entrar con tu código de cliente y tu clave.</p>
+          <form action={salirCliente}><button className="btn">Entrar con mi código</button></form>
         </div>
       </main>
     );
