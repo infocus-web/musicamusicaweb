@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f5f0;
+  --fg: #1c1a17;
+  --muted: #6f6a61;
+  --card: #ffffff;
+  --line: #e4dfd5;
+  --accent: #b4532a;
+  --accent-fg: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151412;
+    --fg: #f1ede6;
+    --muted: #a39d92;
+    --card: #1f1d1a;
+    --line: #34312c;
+    --accent: #e0774a;
+    --accent-fg: #151412;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border p-5;
+    background: var(--card);
+    border-color: var(--line);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition disabled:opacity-50;
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition;
+    border-color: var(--line);
+  }
+  .btn-ghost:hover { background: color-mix(in srgb, var(--fg) 5%, transparent); }
+  .field { @apply flex flex-col gap-1 text-sm; }
+  .field > span { color: var(--muted); }
+  .field input, .field select, .field textarea {
+    @apply rounded-xl border px-3 py-2 text-base outline-none;
+    background: var(--bg);
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+  .badge { @apply inline-block rounded-full px-2.5 py-0.5 text-xs font-medium; }
+  .muted { color: var(--muted); }
+  .link { color: var(--accent); @apply underline-offset-2 hover:underline; }
+}
