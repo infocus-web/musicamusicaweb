@@ -38,7 +38,14 @@ export async function SiteFooter() {
           {a.instagram && <li><a href={`https://instagram.com/${a.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer" className="hover:underline">@{a.instagram.replace(/^@/, "")}</a></li>}
         </Col>}
       </div>
-      <p className="border-t border-zinc-800 px-4 py-4 text-center text-xs text-zinc-400">© {new Date().getFullYear()} Música Música Web · musicamusicaweb.com.ar</p>
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-zinc-800 px-4 py-4 text-xs text-zinc-400">
+        <span>© {new Date().getFullYear()} Música Música Web · musicamusicaweb.com.ar</span>
+        {/* Acceso del personal: si no hay sesión, /taller manda al login; si ya entraste, va directo al panel. */}
+        <Link href="/taller" className="inline-flex items-center gap-1 rounded border border-zinc-700 px-2.5 py-1 hover:border-zinc-500 hover:text-white">
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+          Acceso taller
+        </Link>
+      </div>
     </footer>
   );
 }
