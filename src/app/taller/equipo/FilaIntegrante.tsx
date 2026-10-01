@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { cambiarClaveIntegrante, cambiarRol, quitarAcceso } from "./actions";
 import { InputClave } from "@/components/InputClave";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 type Props = { userId: string; nombre: string | null; email: string | null; rol: string; esYo: boolean; duenio: boolean };
 
@@ -25,7 +26,7 @@ export function FilaIntegrante({ userId, nombre, email, rol, esYo, duenio }: Pro
               <option value="tecnico">Técnico</option>
               <option value="admin">Administrador</option>
             </select>
-            <button className="btn-ghost !px-3 !py-1">Guardar</button>
+            <BotonGuardar className="btn-ghost !px-3 !py-1" />
           </form>
         )}
         {(esYo || !duenio) && <button type="button" className="text-sm link" onClick={() => setAbierto(!abierto)}>Cambiar clave</button>}

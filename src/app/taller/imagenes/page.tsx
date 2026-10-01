@@ -4,6 +4,7 @@ import { SLOTS } from "@/lib/imagenes-sitio";
 import { SlotImagen } from "./SlotImagen";
 import { guardarTextosBanner, guardarVideosPortada } from "./actions";
 import { CampoVideos } from "@/components/CampoVideos";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function ImagenesPage() {
               <label className="field sm:col-span-2"><span>Bajada</span><input name="hero_texto" defaultValue={a.hero_texto ?? ""} placeholder="Calibración, reparación y puesta a punto. Seguí el avance online." /></label>
               <label className="field"><span>Texto del botón</span><input name="hero_boton" defaultValue={a.hero_boton ?? ""} placeholder="Pedí tu service" /></label>
               <label className="field"><span>Link del botón</span><input name="hero_link" defaultValue={a.hero_link ?? ""} placeholder="/asesor" /></label>
-              <div className="sm:col-span-2"><button className="btn">Guardar textos</button></div>
+              <div className="sm:col-span-2"><BotonGuardar>Guardar textos</BotonGuardar></div>
             </form>
           )}
         </section>
@@ -52,7 +53,7 @@ export default async function ImagenesPage() {
         <p className="muted text-sm">Pegá los links de YouTube (también sirven Instagram, TikTok o Vimeo). Aparecen en la portada en la sección “Videos del taller”, en el mismo orden.</p>
         <form action={guardarVideosPortada} className="space-y-3">
           <CampoVideos inicial={(a.videos_portada ?? "").split("\n").filter(Boolean)} />
-          <button className="btn">Guardar videos</button>
+          <BotonGuardar>Guardar videos</BotonGuardar>
         </form>
       </section>
 

@@ -59,7 +59,7 @@ export default async function PedidoTallerPage({ params }: { params: Promise<{ i
             <form action={cotizarEnvio.bind(null, p.id)} className="card space-y-2">
               <h2 className="font-semibold">Cotizar envío por correo</h2>
               <label className="field"><span>Costo del envío ($)</span><input name="costo" inputMode="decimal" required /></label>
-              <button className="btn w-full">Guardar costo</button>
+              <BotonGuardar className="btn w-full">Guardar costo</BotonGuardar>
               <p className="muted text-xs">Después mandale el link por WhatsApp para que pague.</p>
             </form>
           )}

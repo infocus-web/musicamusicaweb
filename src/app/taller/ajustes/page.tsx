@@ -3,6 +3,7 @@ import { obtenerStaff } from "@/lib/auth";
 import { obtenerAjustes } from "@/lib/ajustes";
 import { guardarAjustes } from "./actions";
 import Link from "next/link";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function AjustesPage() {
   const { staff } = await obtenerStaff();
@@ -41,7 +42,7 @@ export default async function AjustesPage() {
         <p className="muted text-xs">Si lo dejás vacío se muestra un texto base. Conviene que lo revise un abogado o contador.</p>
         <textarea name="terminos" rows={12} defaultValue={a.terminos ?? ""} className="w-full rounded-xl border p-3 text-base" style={{ borderColor: "var(--line)", background: "var(--bg)" }} />
       </section>
-      <button className="btn">Guardar ajustes</button>
+      <BotonGuardar>Guardar ajustes</BotonGuardar>
     </form>
   );
 }
