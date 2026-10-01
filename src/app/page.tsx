@@ -109,9 +109,9 @@ export default async function Home() {
         <section className="relative isolate overflow-hidden bg-black text-white">
           {hero.video && (
             <>
-              {/* Video de fondo detrás del logo: en loop, sin sonido, al 50% sobre el negro */}
+              {/* Video de fondo detrás del logo: en loop, sin sonido, al 25% sobre el negro */}
               <video src={hero.video} poster={imgs.hero_video ? undefined : "/video/portada.jpg"} autoPlay muted loop playsInline preload="auto" aria-hidden
-                className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50" />
+                className="absolute inset-0 -z-10 h-full w-full object-cover opacity-25" />
             </>
           )}
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
