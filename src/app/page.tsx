@@ -51,7 +51,7 @@ function Etiquetado({ children, tag, rojo = true }: { children: React.ReactNode;
 /** Dibujo por defecto del banner (cuerdas y brillo rojo) mientras no se cargue una foto en Ajustes. */
 function ArteBanner() {
   return (
-    <div className="relative h-full min-h-[260px] overflow-hidden bg-zinc-900">
+    <div className="relative h-full min-h-[260px] w-full overflow-hidden rounded-lg bg-zinc-900">
       <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 30% 40%, rgba(217,0,0,.55), transparent 55%), linear-gradient(135deg,#1a1a1a,#050505)" }} />
       <svg className="absolute inset-0 h-full w-full opacity-60" viewBox="0 0 800 400" preserveAspectRatio="none" aria-hidden>
         {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -103,24 +103,30 @@ export default async function Home() {
     <>
       <SiteHeader />
       <main>
-        {/* Banner principal */}
-        <section className="grid bg-black lg:grid-cols-[1.35fr_1fr]">
-          {hero.imagen ? <img src={hero.imagen} alt="" className="h-full max-h-[460px] min-h-[260px] w-full object-cover" /> : <ArteBanner />}
-          <div className="flex flex-col justify-center gap-4 px-6 py-10 text-white sm:px-12">
-            <h1 className="titulo text-4xl sm:text-5xl">{hero.titulo}</h1>
-            <p className="text-lg font-semibold text-amber-400">{hero.texto}</p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Link href={hero.link} className="inline-flex items-center rounded bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-red-700">{hero.boton}</Link>
-              <Link href="/mi-cuenta" className="inline-flex items-center rounded border border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">Ver mi instrumento</Link>
+        {/* Banner principal: el logo entero (sin recortes) a la izquierda y el mensaje a la derecha */}
+        <section className="bg-black text-white">
+          <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+            <div className="flex items-center justify-center">
+              {hero.imagen
+                ? <img src={hero.imagen} alt="Música Música Web" className="h-auto max-h-[240px] w-full object-contain sm:max-h-[340px] lg:max-h-[400px]" />
+                : <ArteBanner />}
+            </div>
+            <div className="flex flex-col gap-4 text-center lg:text-left">
+              <h1 className="titulo text-4xl leading-[1.05] sm:text-5xl xl:text-6xl">{hero.titulo}</h1>
+              <p className="text-lg font-semibold text-amber-400 sm:text-xl">{hero.texto}</p>
+              <div className="flex flex-wrap justify-center gap-3 pt-2 lg:justify-start">
+                <Link href={hero.link} className="inline-flex items-center rounded bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-red-700">{hero.boton}</Link>
+                <Link href="/mi-cuenta" className="inline-flex items-center rounded border border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">Ver mi instrumento</Link>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Tres tarjetas */}
-        <section className="bg-black px-4 pb-8">
+        {/* Tres tarjetas, separadas del banner */}
+        <section className="border-t border-white/10 bg-zinc-950 px-4 py-8">
           <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-3">
             {tiles.map((t) => (
-              <Link key={t.href} href={t.href} className="group relative block aspect-[16/9] overflow-hidden bg-zinc-800">
+              <Link key={t.href} href={t.href} className="group relative block aspect-[16/9] overflow-hidden rounded-md bg-zinc-800 sm:aspect-[4/3] lg:aspect-[16/9]">
                 {t.img ? <img src={t.img} alt="" className="h-full w-full object-cover opacity-70 transition group-hover:scale-105 group-hover:opacity-90" />
                   : <div className="h-full w-full" style={{ background: t.rojo ? "linear-gradient(135deg,#d90000,#5a0000)" : "linear-gradient(135deg,#2b2b2b,#0d0d0d)" }} />}
                 <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/20 to-transparent p-4 text-white">
