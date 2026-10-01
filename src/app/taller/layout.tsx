@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { obtenerStaff } from "@/lib/auth";
 import { salir } from "../login/actions";
 import { Logo } from "@/components/Logo";
+import { cookies } from "next/headers";
+import { BotonTema } from "./BotonTema";
 
 export default async function TallerLayout({ children }: { children: React.ReactNode }) {
   const { user, staff } = await obtenerStaff();
@@ -22,8 +24,10 @@ export default async function TallerLayout({ children }: { children: React.React
     );
   }
 
+  const oscuro = (await cookies()).get("tema-taller")?.value === "oscuro";
+
   return (
-    <div className="min-h-screen">
+    <div id="panel-taller" className={`min-h-screen ${oscuro ? "tema-oscuro" : ""}`}>
       <header className="border-b" style={{ borderColor: "var(--line)" }}>
         <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3 text-sm">
           <Link href="/taller" className="flex items-center gap-2 font-semibold"><Logo alto={32} /> <span>Taller</span></Link>
@@ -40,6 +44,7 @@ export default async function TallerLayout({ children }: { children: React.React
           <span className="ml-auto muted hidden sm:inline">
             {staff.nombre ?? user.email} · {staff.rol === "admin" ? "Administrador" : "Técnico"}
           </span>
+          <BotonTema inicial={oscuro} />
           <Link href="/taller/mi-clave" className="muted hover:underline">Mi clave</Link>
           <form action={salir}><button className="muted hover:underline">Salir</button></form>
         </nav>

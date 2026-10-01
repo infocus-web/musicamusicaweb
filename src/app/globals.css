@@ -79,3 +79,20 @@ body {
 .btn-rojo:hover { background: var(--accent); color: var(--accent-fg); }
 .sin-barra::-webkit-scrollbar { display: none; }
 .sin-barra { scrollbar-width: none; }
+
+/* ---------- Panel del taller en modo oscuro (botón luna) ---------- */
+.tema-oscuro {
+  --bg: #0f0f11;
+  --fg: #ececee;
+  --muted: #a1a1aa;
+  --card: #18181b;
+  --line: #2f2f35;
+  --soft: #232328;
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+}
+.tema-oscuro .bg-white { background-color: var(--card); }
+.tema-oscuro .bg-zinc-200 { background-color: #2f2f35; }
+.tema-oscuro .text-zinc-700, .tema-oscuro .text-zinc-800 { color: #d4d4d8; }
+.tema-oscuro img { color-scheme: light; }
