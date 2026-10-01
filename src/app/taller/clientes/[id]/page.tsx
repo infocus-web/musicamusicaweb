@@ -7,12 +7,15 @@ import { CopiarLink } from "@/components/CopiarLink";
 import { AccesoCliente } from "@/components/AccesoCliente";
 import { actualizarCliente, crearInstrumento, crearTrabajo, marcarRevisado, regenerarLink } from "../../actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
+import { obtenerStaff } from "@/lib/auth";
+import { BorrarCliente } from "./BorrarCliente";
 
 export default async function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const { data: c } = await supabase.from("clientes").select("*").eq("id", id).maybeSingle();
   if (!c) notFound();
+  const { staff } = await obtenerStaff();
 
   const [{ data: instrumentos }, { data: trabajos }] = await Promise.all([
     supabase.from("instrumentos").select("*").eq("cliente_id", id).order("creado_en"),
@@ -136,6 +139,8 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             <label className="field"><span>Notas</span><textarea name="notas" rows={2} defaultValue={c.notas ?? ""} /></label>
             <BotonGuardar className="btn-ghost">Guardar cambios</BotonGuardar>
           </form>
+
+          {staff?.rol === "admin" && <BorrarCliente id={c.id} nombre={c.nombre} codigo={c.codigo} trabajos={trabajos?.length ?? 0} />}
         </div>
       </div>
     </div>

@@ -199,3 +199,33 @@ export async function marcarRevisado(id: string) {
   revalidatePath(`/taller/clientes/${id}`);
   revalidatePath("/taller/clientes");
 }
+
+/**
+ * Borra un cliente para siempre (solo administradores): sus instrumentos, trabajos, fotos/videos de avances
+ * y su acceso con clave. Los pedidos de la tienda y las reseñas se conservan, sin el cliente asociado.
+ */
+export async function borrarCliente(id: string) {
+  const { exigirAdmin } = await import("@/lib/auth");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  await exigirAdmin();
+  const admin = createAdminClient();
+  const { data: c } = await admin.from("clientes").select("id, user_id").eq("id", id).maybeSingle();
+  if (!c) redirect("/taller/clientes");
+
+  // Archivos de avances (fotos y videos del taller) de todos sus trabajos.
+  const { data: trabajos } = await admin.from("trabajos").select("id").eq("cliente_id", id);
+  const ids = (trabajos ?? []).map((t) => t.id);
+  if (ids.length) {
+    const { data: avances } = await admin.from("avances").select("media_path").in("trabajo_id", ids);
+    const rutas = (avances ?? []).map((a) => a.media_path).filter((p): p is string => !!p);
+    for (let i = 0; i < rutas.length; i += 100) await admin.storage.from("avances").remove(rutas.slice(i, i + 100));
+  }
+
+  const { error } = await admin.from("clientes").delete().eq("id", id); // instrumentos, trabajos y avances se borran en cascada
+  if (error) throw new Error(error.message);
+  if (c.user_id) await admin.auth.admin.deleteUser(c.user_id);
+
+  revalidatePath("/taller/clientes");
+  revalidatePath("/taller");
+  redirect("/taller/clientes");
+}

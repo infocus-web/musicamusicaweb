@@ -4,9 +4,9 @@ import { useActionState, useState } from "react";
 import { cambiarClaveIntegrante, cambiarRol, quitarAcceso } from "./actions";
 import { InputClave } from "@/components/InputClave";
 
-type Props = { userId: string; nombre: string | null; email: string | null; rol: string; esYo: boolean };
+type Props = { userId: string; nombre: string | null; email: string | null; rol: string; esYo: boolean; duenio: boolean };
 
-export function FilaIntegrante({ userId, nombre, email, rol, esYo }: Props) {
+export function FilaIntegrante({ userId, nombre, email, rol, esYo, duenio }: Props) {
   const [abierto, setAbierto] = useState(false);
   const [estado, accion, pendiente] = useActionState(cambiarClaveIntegrante.bind(null, userId), undefined);
 
@@ -14,10 +14,10 @@ export function FilaIntegrante({ userId, nombre, email, rol, esYo }: Props) {
     <li className="space-y-3 rounded-xl border p-4" style={{ borderColor: "var(--line)" }}>
       <div className="flex flex-wrap items-center gap-3">
         <div className="mr-auto">
-          <p className="font-medium">{nombre ?? "Sin nombre"} {esYo && <span className="muted text-xs">(vos)</span>}</p>
+          <p className="font-medium">{nombre ?? "Sin nombre"} {esYo && <span className="muted text-xs">(vos)</span>} {duenio && <span className="badge bg-amber-100 text-amber-800">Cuenta principal</span>}</p>
           <p className="muted text-sm">{email}</p>
         </div>
-        {esYo ? (
+        {esYo || duenio ? (
           <span className="badge bg-zinc-200 text-zinc-700">{rol === "admin" ? "Administrador" : "Técnico"}</span>
         ) : (
           <form action={cambiarRol.bind(null, userId)} className="flex gap-2">
@@ -28,8 +28,8 @@ export function FilaIntegrante({ userId, nombre, email, rol, esYo }: Props) {
             <button className="btn-ghost !px-3 !py-1">Guardar</button>
           </form>
         )}
-        <button type="button" className="text-sm link" onClick={() => setAbierto(!abierto)}>Cambiar clave</button>
-        {!esYo && (
+        {(esYo || !duenio) && <button type="button" className="text-sm link" onClick={() => setAbierto(!abierto)}>Cambiar clave</button>}
+        {!esYo && !duenio && (
           <button
             type="button"
             className="text-sm text-red-600 hover:underline"

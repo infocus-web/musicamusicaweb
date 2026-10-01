@@ -6,6 +6,9 @@ export type Rol = "admin" | "tecnico";
 export type Staff = { user_id: string; nombre: string | null; rol: Rol; email: string | null };
 
 /** Usuario logueado + su registro de personal (null si no es del taller). */
+/** Cuenta principal del taller: nadie más puede quitarle el acceso, bajarle el rol ni cambiarle la clave. */
+export const EMAIL_DUENIO = "tallermusicamusicaweb@gmail.com";
+
 export async function obtenerStaff() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

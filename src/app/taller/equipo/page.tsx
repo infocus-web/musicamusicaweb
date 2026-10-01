@@ -3,6 +3,7 @@ import { obtenerStaff } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { FormNuevo } from "./FormNuevo";
 import { FilaIntegrante } from "./FilaIntegrante";
+import { EMAIL_DUENIO } from "@/lib/auth";
 
 export default async function EquipoPage() {
   const { user, staff } = await obtenerStaff();
@@ -22,7 +23,7 @@ export default async function EquipoPage() {
         </div>
         <ul className="space-y-3">
           {(equipo ?? []).map((m) => (
-            <FilaIntegrante key={m.user_id} userId={m.user_id} nombre={m.nombre} email={m.email} rol={m.rol} esYo={m.user_id === user.id} />
+            <FilaIntegrante key={m.user_id} userId={m.user_id} nombre={m.nombre} email={m.email} rol={m.rol} esYo={m.user_id === user.id} duenio={m.email?.toLowerCase() === EMAIL_DUENIO} />
           ))}
         </ul>
       </section>
