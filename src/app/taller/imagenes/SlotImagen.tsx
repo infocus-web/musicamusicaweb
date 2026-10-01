@@ -12,13 +12,19 @@ export function SlotImagen({ slot, inicial }: { slot: Slot; inicial: string | nu
   const [estado, setEstado] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState(false);
 
+  const esVideo = slot.tipo === "video";
+
   async function subir(f?: File | null) {
-    if (!f || !f.type.startsWith("image/")) return;
-    setEstado("Subiendo…");
+    if (!f) return;
+    if (esVideo ? !f.type.startsWith("video/") : !f.type.startsWith("image/")) { setEstado(`No se pudo subir: elegí ${esVideo ? "un video" : "una foto"}.`); return; }
+    if (esVideo && f.size > 45 * 1024 * 1024) { setEstado("No se pudo subir: el video pesa más de 45 MB. Recortalo o exportalo más liviano (1080p o 720p)."); return; }
+    setEstado(esVideo ? `Subiendo video (${Math.round(f.size / 1048576)} MB)… puede tardar un poco` : "Subiendo…");
     try {
       const lado = slot.ratio === "1/1" ? 1200 : 2400;
-      const nuevo = `${slot.id}/${Date.now()}.jpg`;
-      const { error } = await createClient().storage.from("sitio").upload(nuevo, await comprimirImagen(f, lado, 0.86), { contentType: "image/jpeg", cacheControl: "31536000" });
+      const ext = esVideo ? (f.name.split(".").pop()?.toLowerCase() || "mp4") : "jpg";
+      const nuevo = `${slot.id}/${Date.now()}.${ext}`;
+      const cuerpo = esVideo ? f : await comprimirImagen(f, lado, 0.86);
+      const { error } = await createClient().storage.from("sitio").upload(nuevo, cuerpo, { contentType: esVideo ? f.type : "image/jpeg", cacheControl: "31536000" });
       if (error) throw new Error(error.message);
       await guardarImagenSitio(slot.id, nuevo);
       setPath(nuevo); setEstado("¡Publicada en la web!");
@@ -36,10 +42,12 @@ export function SlotImagen({ slot, inicial }: { slot: Slot; inicial: string | nu
         onDragLeave={() => setArrastrando(false)}
         onDrop={(e) => { e.preventDefault(); setArrastrando(false); subir(e.dataTransfer.files?.[0]); }}
       >
-        {path ? <img src={urlSitio(path)!} alt="" className="h-full w-full object-cover" />
-          : <span className="absolute inset-0 grid place-items-center p-3 text-center text-sm muted">Tocá o arrastrá una foto acá</span>}
-        {path && <span className="absolute inset-0 grid place-items-center bg-black/50 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100">Cambiar foto</span>}
-        <input type="file" accept="image/*" className="hidden" onChange={(e) => { subir(e.target.files?.[0]); e.target.value = ""; }} />
+        {path ? (esVideo
+            ? <video src={urlSitio(path)!} className="h-full w-full object-cover" autoPlay muted loop playsInline />
+            : <img src={urlSitio(path)!} alt="" className="h-full w-full object-cover" />)
+          : <span className="absolute inset-0 grid place-items-center p-3 text-center text-sm muted">{esVideo ? "Tocá o arrastrá un video acá" : "Tocá o arrastrá una foto acá"}</span>}
+        {path && <span className="absolute inset-0 grid place-items-center bg-black/50 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100">{esVideo ? "Cambiar video" : "Cambiar foto"}</span>}
+        <input type="file" accept={esVideo ? "video/mp4,video/webm,video/quicktime" : "image/*"} className="hidden" onChange={(e) => { subir(e.target.files?.[0]); e.target.value = ""; }} />
       </label>
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -48,7 +56,7 @@ export function SlotImagen({ slot, inicial }: { slot: Slot; inicial: string | nu
         </div>
         {path && (
           <button type="button" className="shrink-0 text-xs text-red-600 hover:underline"
-            onClick={async () => { if (!confirm("¿Quitar esta foto de la web?")) return; await guardarImagenSitio(slot.id, null); setPath(null); setEstado("Quitada."); }}>
+            onClick={async () => { if (!confirm(esVideo ? "¿Quitar este video de la web?" : "¿Quitar esta foto de la web?")) return; await guardarImagenSitio(slot.id, null); setPath(null); setEstado("Quitada."); }}>
             Quitar
           </button>
         )}

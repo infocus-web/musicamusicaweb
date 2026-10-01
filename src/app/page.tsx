@@ -91,6 +91,8 @@ export default async function Home() {
     boton: a.hero_boton || "Pedí tu service",
     link: a.hero_link || "/asesor",
     imagen: urlSitio(a.hero_imagen),
+    // Si no se cargó un video desde el panel, se usa el que viene con la web.
+    video: urlSitio(imgs.hero_video) ?? "/video/portada.mp4",
   };
 
   const tiles = [
@@ -104,11 +106,18 @@ export default async function Home() {
       <SiteHeader />
       <main>
         {/* Banner principal: el logo entero (sin recortes) a la izquierda y el mensaje a la derecha */}
-        <section className="bg-black text-white">
+        <section className="relative isolate overflow-hidden bg-black text-white">
+          {hero.video && (
+            <>
+              {/* Video de fondo detrás del logo: en loop, sin sonido, al 50% sobre el negro */}
+              <video src={hero.video} poster={imgs.hero_video ? undefined : "/video/portada.jpg"} autoPlay muted loop playsInline preload="auto" aria-hidden
+                className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50 motion-reduce:hidden" />
+            </>
+          )}
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
             <div className="flex items-center justify-center">
               {hero.imagen
-                ? <img src={hero.imagen} alt="Música Música Web" className="h-auto max-h-[240px] w-full object-contain sm:max-h-[340px] lg:max-h-[400px]" />
+                ? <img src={hero.imagen} alt="Música Música Web" className={`h-auto max-h-[240px] w-full object-contain sm:max-h-[340px] lg:max-h-[400px] ${hero.video ? "mix-blend-lighten" : ""}`} />
                 : <ArteBanner />}
             </div>
             <div className="flex flex-col gap-4 text-center lg:text-left">

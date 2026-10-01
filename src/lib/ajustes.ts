@@ -28,6 +28,6 @@ export function waTaller(numero: string | null, mensaje: string) {
 
 /** Rutas de las fotos cargadas en "Imágenes de la web", por clave. */
 export const obtenerImagenesSitio = cache(async (): Promise<Record<string, string | null>> => {
-  const { data } = await createAdminClient().from("ajustes").select("clave, valor").or("clave.like.img_%,clave.eq.hero_imagen");
+  const { data } = await createAdminClient().from("ajustes").select("clave, valor").or("clave.like.img_%,clave.eq.hero_imagen,clave.eq.hero_video");
   return Object.fromEntries((data ?? []).map((r) => [r.clave, r.valor]));
 });
