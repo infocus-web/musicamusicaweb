@@ -6,18 +6,21 @@ import { TarjetaProducto } from "@/components/TarjetaProducto";
 import { TarjetaUsado } from "@/components/TarjetaUsado";
 import type { Producto } from "@/lib/tienda";
 import type { Usado } from "@/lib/usados";
+import { filtrosBusqueda } from "@/lib/busqueda";
 
 export const metadata: Metadata = { title: "Buscar — Música Música Web", robots: { index: false } };
 
 export default async function BuscarPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = ((await searchParams).q ?? "").trim().slice(0, 80);
-  const s = q.replace(/[%,()]/g, " ");
   const db = createAdminClient();
-  const [{ data: prods }, { data: usados }] = q
-    ? await Promise.all([
-        db.from("productos").select("*, variantes(*)").eq("activo", true).or(`nombre.ilike.%${s}%,marca.ilike.%${s}%,sku.ilike.%${s}%`).limit(48),
-        db.from("usados").select("*").in("estado", ["publicado", "reservado"]).or(`titulo.ilike.%${s}%,marca.ilike.%${s}%,modelo.ilike.%${s}%`).limit(24),
-      ])
+  const fp = filtrosBusqueda(q, ["nombre", "marca", "sku"]);
+  const fu = filtrosBusqueda(q, ["titulo", "marca", "modelo"]);
+  let qp = db.from("productos").select("*, variantes(*)").eq("activo", true);
+  for (const f of fp) qp = qp.or(f);
+  let qu = db.from("usados").select("*").in("estado", ["publicado", "reservado"]);
+  for (const f of fu) qu = qu.or(f);
+  const [{ data: prods }, { data: usados }] = fp.length
+    ? await Promise.all([qp.limit(48), qu.limit(24)])
     : [{ data: [] }, { data: [] }];
   const P = (prods ?? []) as Producto[];
   const U = (usados ?? []) as Usado[];

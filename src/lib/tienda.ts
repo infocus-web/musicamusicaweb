@@ -23,6 +23,7 @@ export type Producto = {
   fotos: string[]; activo: boolean; destacado: boolean; sku: string | null; creado_en: string; actualizado_en: string;
   variantes?: Variante[];
   videos: string[];
+  borrador?: boolean;
 };
 
 export const fotoProducto = (path?: string | null) =>

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIAS_TIENDA, categoriaTiendaLabel, fotoProducto, pesos, type Producto } from "@/lib/tienda";
 import { crearProducto } from "./actions";
+import { filtrosBusqueda } from "@/lib/busqueda";
 
 export default async function TiendaTallerPage({ searchParams }: { searchParams: Promise<{ cat?: string; q?: string; stock?: string }> }) {
   const { cat, q, stock } = await searchParams;
   const supabase = await createClient();
   let query = supabase.from("productos").select("*, variantes(*)").order("actualizado_en", { ascending: false }).limit(500);
   if (cat) query = query.eq("categoria", cat);
-  if (q) query = query.or(`nombre.ilike.%${q.replace(/[%,()]/g, " ")}%,sku.ilike.%${q.replace(/[%,()]/g, " ")}%`);
+  if (q) for (const f of filtrosBusqueda(q, ["nombre", "marca", "sku"])) query = query.or(f);
   const { data } = await query;
   let productos = (data ?? []) as Producto[];
   const stockTotal = (p: Producto) => (p.variantes?.length ? p.variantes.reduce((a, v) => a + v.stock, 0) : p.stock);
@@ -55,7 +56,9 @@ export default async function TiendaTallerPage({ searchParams }: { searchParams:
                   <td className="p-3">{categoriaTiendaLabel(p.categoria)}</td>
                   <td className="p-3">{pesos(p.precio)}{p.variantes?.length ? <span className="muted"> ({p.variantes.length} opc.)</span> : null}</td>
                   <td className="p-3">{p.tipo === "servicio" ? "—" : p.sin_stock_vende ? "A pedido" : <span className={st <= 2 ? "font-semibold text-red-600" : ""}>{st}</span>}</td>
-                  <td className="p-3"><span className={`badge ${p.activo ? "bg-emerald-100 text-emerald-800" : "bg-zinc-200 text-zinc-700"}`}>{p.activo ? "Publicado" : "Oculto"}</span></td>
+                  <td className="p-3">{p.borrador
+                    ? <span className="badge bg-amber-100 text-amber-800">Borrador sin guardar</span>
+                    : <span className={`badge ${p.activo ? "bg-emerald-100 text-emerald-800" : "bg-zinc-200 text-zinc-700"}`}>{p.activo ? "Publicado" : "Oculto"}</span>}</td>
                 </tr>
               );
             })}

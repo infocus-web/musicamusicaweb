@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CATEGORIAS_TIENDA, type Producto } from "@/lib/tienda";
+import { filtrosBusqueda } from "@/lib/busqueda";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TarjetaProducto } from "@/components/TarjetaProducto";
 
@@ -14,7 +15,7 @@ export default async function TiendaPage({ searchParams }: { searchParams: Promi
   const { cat, q, orden = "destacados" } = await searchParams;
   let query = createAdminClient().from("productos").select("*, variantes(*)").eq("activo", true);
   if (cat) query = query.eq("categoria", cat);
-  if (q) { const s = q.replace(/[%,()]/g, " ").trim(); query = query.or(`nombre.ilike.%${s}%,marca.ilike.%${s}%,sku.ilike.%${s}%`); }
+  if (q) for (const f of filtrosBusqueda(q, ["nombre", "marca", "sku"])) query = query.or(f);
   query = orden === "precio_asc" ? query.order("precio") : orden === "precio_desc" ? query.order("precio", { ascending: false })
     : orden === "nuevos" ? query.order("creado_en", { ascending: false }) : query.order("destacado", { ascending: false }).order("nombre");
   const { data } = await query.limit(300);

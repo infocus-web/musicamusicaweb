@@ -33,7 +33,7 @@ export async function crearProducto(fd: FormData) {
   const nombre = txt(fd, "nombre", 160) ?? "Nuevo producto";
   const tipo = fd.get("tipo") === "servicio" ? "servicio" : "producto";
   const { data, error } = await supabase.from("productos")
-    .insert({ nombre, slug: await slugLibre(nombre), tipo, categoria: tipo === "servicio" ? "servicios" : "accesorios" })
+    .insert({ nombre, slug: await slugLibre(nombre), tipo, categoria: tipo === "servicio" ? "servicios" : "accesorios", borrador: true })
     .select("id").single();
   if (error || !data) throw new Error(error?.message ?? "No se pudo crear");
   redirect(`/taller/tienda/${data.id}`);
@@ -54,8 +54,16 @@ export async function guardarProducto(id: string, fd: FormData) {
     sin_stock_vende: fd.get("sin_stock_vende") === "on",
     activo: fd.get("activo") === "on", destacado: fd.get("destacado") === "on",
     videos: limpiarVideos(String(fd.get("videos") ?? "")),
+    borrador: false,
   }).eq("id", id);
   if (error) throw new Error(error.message);
+
+  // Costo (el campo solo aparece para el admin; la tabla está protegida por RLS).
+  if (fd.has("costo")) {
+    const costo = num(fd.get("costo"));
+    await supabase.from("costos").delete().eq("producto_id", id).is("variante_id", null);
+    if (costo != null && costo >= 0) await supabase.from("costos").insert({ producto_id: id, variante_id: null, costo });
+  }
 
   // Variantes: filas var_nombre[] / var_precio[] / var_stock[] / var_id[]
   const nombres = fd.getAll("var_nombre").map(String), precios = fd.getAll("var_precio"), stocks = fd.getAll("var_stock"), ids = fd.getAll("var_id").map(String);

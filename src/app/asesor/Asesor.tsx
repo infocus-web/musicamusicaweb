@@ -71,6 +71,12 @@ const PASOS: Record<string, Paso[]> = {
   vender: [],
 };
 
+/** Rótulos cortos para el mensaje de WhatsApp. */
+const ROTULOS: Record<string, string> = {
+  instrumento: "Instrumento", problema: "Qué le pasa", urgencia: "Para cuándo",
+  nivel: "Nivel", presupuesto: "Presupuesto", preferencia: "Nuevo o usado",
+};
+
 function servicioSugerido(problemas: string[]) {
   if (problemas.includes("Falla eléctrica")) return "Revisión de electrónica: potes, jack, soldaduras y blindaje.";
   if (problemas.includes("Trastes gastados")) return "Nivelado y coronado de trastes (o cambio, según el desgaste).";
@@ -231,10 +237,11 @@ export function Asesor({ whatsapp, compacto = false, alCerrar }: Props) {
     return () => window.removeEventListener("keydown", tecla);
   });
 
-  const resumen = pasos.map((p) => `• ${p.pregunta.replace(/^[^¿]*¿/, "").replace("?", "")}: ${etiqueta(p, resp[p.id] ?? []) || "—"}`).join("\n");
+  // Mensaje de WhatsApp escrito como lo mandaría el cliente (rótulos cortos, sin las preguntas del asesor).
+  const resumen = pasos.map((p) => `${ROTULOS[p.id] ?? p.id}: ${etiqueta(p, resp[p.id] ?? []) || "—"}`).join("\n");
   const msg = objetivo === "reparar"
-    ? `Hola! Hice el asesor de la web. Necesito un service:\n${resumen}\nSugerido: ${servicioSugerido(resp.problema ?? [])}`
-    : `Hola! Hice el asesor de la web y busco recomendación:\n${resumen}`;
+    ? `Hola! Les escribo desde la web por un service.\n${resumen}\nService sugerido: ${servicioSugerido(resp.problema ?? []).replace(": ", " — ")}\n¿Me pasan presupuesto y cuándo lo puedo llevar?`
+    : `Hola! Les escribo desde la web, estoy buscando un instrumento.\n${resumen}\n¿Qué me recomiendan?`;
   const wa = useMemo(() => {
     let n = (whatsapp ?? "").replace(/\D/g, "");
     if (!n) return null;
