@@ -1,3 +1,4 @@
+import { CampoEmail } from "@/components/CampoEmail";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { crearCliente } from "../actions";
@@ -76,7 +77,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
           <p className="muted text-xs">El código (MM-0001…) y el link privado se generan solos.</p>
           <label className="field"><span>Nombre *</span><input name="nombre" required /></label>
           <label className="field"><span>Teléfono (WhatsApp)</span><input name="telefono" inputMode="tel" placeholder="11 2345 6789" /></label>
-          <label className="field"><span>Email</span><input name="email" type="email" /></label>
+          <CampoEmail autoComplete="off" />
           <label className="field"><span>Notas</span><textarea name="notas" rows={2} /></label>
           <button className="btn w-full">Crear cliente</button>
         </form>

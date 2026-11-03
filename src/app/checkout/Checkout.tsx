@@ -1,5 +1,6 @@
 "use client";
 
+import { CampoEmail } from "@/components/CampoEmail";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCarrito } from "@/components/Carrito";
@@ -61,7 +62,7 @@ export function Checkout({ envios, mp, descuentoTransferencia }: { envios: Envio
           <h2 className="font-semibold sm:col-span-2">1. Tus datos</h2>
           <label className="field sm:col-span-2"><span>Nombre y apellido *</span><input name="nombre" required autoComplete="name" /></label>
           <label className="field"><span>WhatsApp *</span><input name="telefono" required inputMode="tel" autoComplete="tel" /></label>
-          <label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" /></label>
+          <CampoEmail />
           <label className="field"><span>DNI (para la factura)</span><input name="dni" inputMode="numeric" /></label>
         </section>
 

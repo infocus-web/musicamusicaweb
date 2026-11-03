@@ -1,5 +1,6 @@
 "use client";
 
+import { CampoEmail } from "@/components/CampoEmail";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { comprimirImagen } from "@/lib/imagen";
@@ -94,7 +95,7 @@ export function FormTasacion({ permuta }: { permuta?: string }) {
         <legend className="font-semibold">Tus datos</legend>
         <label className="field"><span>Nombre *</span><input name="nombre" required autoComplete="name" /></label>
         <label className="field"><span>WhatsApp *</span><input name="telefono" required inputMode="tel" autoComplete="tel" /></label>
-        <label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" /></label>
+        <CampoEmail />
       </fieldset>
 
       {estado && "error" in estado && <p className="text-sm text-red-600">{estado.error}</p>}

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { obtenerAjustes } from "@/lib/ajustes";
 import { crearPreferencia, mpActivo } from "@/lib/mercadopago";
 import { claveTelefono } from "@/lib/csv";
+import { emailValido, sugerirEmail } from "@/lib/email";
 
 type ItemEntrada = { tipo: "producto" | "usado"; id: string; varianteId?: string | null; cantidad: number };
 export type ResultadoPedido = { error: string } | { redirigir: string };
@@ -14,6 +15,9 @@ export async function crearPedido(itemsIn: ItemEntrada[], fd: FormData): Promise
   const nombre = s("nombre", 120), telefono = s("telefono", 40), email = s("email", 160);
   if (!nombre) return { error: "Escribí tu nombre." };
   if (!claveTelefono(telefono)) return { error: "Escribí un teléfono válido, con código de área." };
+  if (email && !emailValido(email)) return { error: "El email no parece válido." };
+  const sugerencia = email && fd.get("email_ok") !== "1" ? sugerirEmail(email) : null;
+  if (sugerencia) return { error: `Revisá el email: ¿quisiste decir ${sugerencia}? Si está bien, tocá “No, está bien así”.` };
   if (!Array.isArray(itemsIn) || itemsIn.length === 0 || itemsIn.length > 50) return { error: "El carrito está vacío." };
 
   const db = createAdminClient();

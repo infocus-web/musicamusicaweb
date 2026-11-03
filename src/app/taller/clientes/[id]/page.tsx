@@ -1,3 +1,4 @@
+import { CampoEmail } from "@/components/CampoEmail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -135,7 +136,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
             <h2 className="font-semibold">Datos del cliente</h2>
             <label className="field"><span>Nombre</span><input name="nombre" defaultValue={c.nombre} required /></label>
             <label className="field"><span>Teléfono</span><input name="telefono" defaultValue={c.telefono ?? ""} /></label>
-            <label className="field"><span>Email</span><input name="email" type="email" defaultValue={c.email ?? ""} /></label>
+            <CampoEmail defaultValue={c.email ?? ""} autoComplete="off" />
             <label className="field"><span>Notas</span><textarea name="notas" rows={2} defaultValue={c.notas ?? ""} /></label>
             <BotonGuardar className="btn-ghost">Guardar cambios</BotonGuardar>
           </form>

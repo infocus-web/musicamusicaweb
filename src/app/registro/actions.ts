@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { claveTelefono } from "@/lib/csv";
 import { emailCliente } from "@/lib/auth";
 import { linkSeguimiento } from "@/lib/estados";
+import { emailValido, sugerirEmail } from "@/lib/email";
 
 export type EstadoRegistro =
   | undefined
@@ -29,7 +30,9 @@ export async function registrarCliente(_prev: EstadoRegistro, fd: FormData): Pro
   if (!nombre || nombre.length < 3) return { error: "Escribí tu nombre y apellido." };
   const tel = claveTelefono(telefono);
   if (!tel) return { error: "Escribí un teléfono válido, con código de área." };
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "El email no parece válido." };
+  if (email && !emailValido(email)) return { error: "El email no parece válido." };
+  const sugerencia = email && fd.get("email_ok") !== "1" ? sugerirEmail(email) : null;
+  if (sugerencia) return { error: `Revisá el email: ¿quisiste decir ${sugerencia}? Si está bien, tocá “No, está bien así”.` };
   if (clave && clave.length < 6) return { error: "La clave tiene que tener al menos 6 caracteres." };
   if (fd.get("acepto") !== "on") return { error: "Necesitamos tu conformidad para guardar tus datos." };
 

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CarritoProvider } from "@/components/Carrito";
 import { AsesorFlotante } from "@/components/AsesorFlotante";
 import { obtenerAjustes } from "@/lib/ajustes";
+import { InstagramProvider } from "@/components/Instagram";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 const oswald = Oswald({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
@@ -17,15 +18,17 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { whatsapp } = await obtenerAjustes();
+  const { whatsapp, instagram } = await obtenerAjustes();
   return (
     <html lang="es-AR">
       <body className={`${inter.variable} ${oswald.variable} antialiased`}>
-        <CarritoProvider>
-          {children}
-          <SiteFooter />
-          <AsesorFlotante whatsapp={whatsapp} />
-        </CarritoProvider>
+        <InstagramProvider usuario={instagram}>
+          <CarritoProvider>
+            {children}
+            <SiteFooter />
+            <AsesorFlotante whatsapp={whatsapp} />
+          </CarritoProvider>
+        </InstagramProvider>
       </body>
     </html>
   );

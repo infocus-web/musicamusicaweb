@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { obtenerAjustes, waTaller } from "@/lib/ajustes";
+import { DEGRADE_IG, IconoInstagram } from "@/components/Instagram";
 
 export async function SiteFooter() {
   const a = await obtenerAjustes();
@@ -35,7 +36,9 @@ export async function SiteFooter() {
           {a.email && <li><a href={`mailto:${a.email}`} className="hover:underline">{a.email}</a></li>}
           {a.direccion && <li><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.direccion)}`} target="_blank" rel="noreferrer" className="hover:underline">{a.direccion}</a></li>}
           {a.horarios && <li>{a.horarios}</li>}
-          {a.instagram && <li><a href={`https://instagram.com/${a.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer" className="hover:underline">@{a.instagram.replace(/^@/, "")}</a></li>}
+          {a.instagram && <li><a href={`https://instagram.com/${a.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-base font-bold text-white transition hover:scale-105" style={{ background: DEGRADE_IG }}>
+            <IconoInstagram className="h-5 w-5" /> @{a.instagram.replace(/^@/, "")}</a></li>}
         </Col>}
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-zinc-800 px-4 py-4 text-xs text-zinc-400">

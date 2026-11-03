@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { registrarCliente } from "./actions";
 import { TIPOS_INSTRUMENTO } from "@/lib/estados";
 import { InputClave } from "@/components/InputClave";
+import { CampoEmail } from "@/components/CampoEmail";
 
 export function FormRegistro() {
   const [estado, accion, pendiente] = useActionState(registrarCliente, undefined);
@@ -46,7 +47,7 @@ export function FormRegistro() {
         <legend className="font-semibold">Tus datos</legend>
         <label className="field"><span>Nombre y apellido *</span><input name="nombre" required autoComplete="name" /></label>
         <label className="field"><span>Teléfono / WhatsApp *</span><input name="telefono" required inputMode="tel" autoComplete="tel" placeholder="11 2345 6789" /></label>
-        <label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" /></label>
+        <CampoEmail />
       </fieldset>
 
       <fieldset className="space-y-3 border-t pt-4" style={{ borderColor: "var(--line)" }}>

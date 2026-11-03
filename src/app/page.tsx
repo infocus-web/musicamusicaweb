@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
+import { FranjaInstagram } from "@/components/Instagram";
 import { TarjetasPromo } from "@/components/TarjetasPromo";
 import { TarjetaUsado } from "@/components/TarjetaUsado";
 import { TarjetaProducto } from "@/components/TarjetaProducto";
@@ -238,6 +239,8 @@ export default async function Home() {
             </section>
           )}
         </div>
+
+        <FranjaInstagram />
 
         {/* Franja de seguimiento */}
         <section style={{ background: "var(--soft)" }}>

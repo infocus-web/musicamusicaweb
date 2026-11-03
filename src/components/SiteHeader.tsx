@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { useCarrito } from "@/components/Carrito";
+import { DEGRADE_IG, IconoInstagram, useInstagram } from "@/components/Instagram";
 
 const NAV = [
   { href: "/tienda", label: "Tienda" },
@@ -28,6 +29,7 @@ export function SiteHeader() {
   const ruta = usePathname();
   const { cantidad } = useCarrito();
   const [menu, setMenu] = useState(false);
+  const ig = useInstagram();
 
   const buscador = (className = "") => (
     <form action="/buscar" className={`flex items-stretch overflow-hidden rounded-full border ${className}`} style={{ borderColor: "var(--line)", background: "var(--soft)" }}>
@@ -46,6 +48,14 @@ export function SiteHeader() {
         <span style={{ color: "var(--accent)" }} className="font-semibold">Revisado en nuestro taller</span>
         <span className="mx-3 text-[var(--line)]">|</span>
         <span>Pagá con Mercado Pago, transferencia o efectivo</span>
+        {ig && (
+          <>
+            <span className="mx-3 text-[var(--line)]">|</span>
+            <a href={ig.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold hover:underline" style={{ color: "#cc2366" }}>
+              <IconoInstagram className="h-3.5 w-3.5" /> Seguinos @{ig.usuario}
+            </a>
+          </>
+        )}
       </div>
 
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-6">
@@ -60,6 +70,12 @@ export function SiteHeader() {
           <button type="button" onClick={() => abrirAsesor(router)} className="hidden rounded-full border-2 px-4 py-1.5 text-sm font-bold sm:block" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
             Asesor
           </button>
+          {ig && (
+            <a href={ig.url} target="_blank" rel="noreferrer" aria-label={`Instagram @${ig.usuario}`} title={`Instagram @${ig.usuario}`}
+              className="grid h-9 w-9 place-items-center rounded-xl text-white shadow-sm transition hover:scale-110" style={{ background: DEGRADE_IG }}>
+              <IconoInstagram className="h-5 w-5" />
+            </a>
+          )}
           <Link href="/mi-cuenta" aria-label="Mi cuenta" title="Mi cuenta" className="hover:opacity-70">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
           </Link>
