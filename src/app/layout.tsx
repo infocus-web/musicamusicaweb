@@ -6,6 +6,7 @@ import { CarritoProvider } from "@/components/Carrito";
 import { AsesorFlotante } from "@/components/AsesorFlotante";
 import { obtenerAjustes } from "@/lib/ajustes";
 import { InstagramProvider } from "@/components/Instagram";
+import { WhatsAppDirecto } from "@/components/WhatsAppDirecto";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 const oswald = Oswald({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
@@ -27,6 +28,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             {children}
             <SiteFooter />
             <AsesorFlotante whatsapp={whatsapp} />
+            <WhatsAppDirecto />
           </CarritoProvider>
         </InstagramProvider>
       </body>
