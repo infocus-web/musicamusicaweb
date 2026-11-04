@@ -1,34 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { Logo } from "@/components/Logo";
-import { TrabajosCliente } from "@/components/TrabajosCliente";
+import { resolverCliente } from "@/lib/acceso-cliente";
+import { PanelCliente } from "@/components/panel-cliente/PanelCliente";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Seguimiento de tu instrumento — Música Música Web",
+  title: "Mi panel — Música Música Web",
   robots: { index: false, follow: false },
 };
 
-export default async function SeguimientoPage({ params }: { params: Promise<{ token: string }> }) {
+/** El link privado que le mandamos al cliente por WhatsApp abre su panel completo, sin clave. */
+export default async function SeguimientoPage({ params, searchParams }: { params: Promise<{ token: string }>; searchParams: Promise<{ tab?: string }> }) {
   const { token } = await params;
-  if (!/^[a-f0-9]{32}$/.test(token)) notFound();
-
-  const { data: cliente } = await createAdminClient()
-    .from("clientes").select("id, nombre, codigo").eq("token", token).maybeSingle();
+  const { tab } = await searchParams;
+  const cliente = await resolverCliente(token);
   if (!cliente) notFound();
-
-  return (
-    <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
-      <header className="space-y-1">
-        <Logo alto={56} prioridad />
-        <h1 className="text-2xl font-semibold">Hola, {cliente.nombre.split(" ")[0]}</h1>
-        <p className="muted text-sm">Código de cliente <span className="font-mono">{cliente.codigo}</span></p>
-      </header>
-
-      <TrabajosCliente clienteId={cliente.id} token={token} />
-
-      <footer className="muted text-center text-xs">Este link es personal. No lo compartas.</footer>
-    </main>
-  );
+  return <PanelCliente cliente={cliente} token={token} tab={tab} base={`/seguimiento/${token}`} />;
 }

@@ -16,11 +16,11 @@ export default function IngresarClientePage({ searchParams }: { searchParams: Pr
         <div className="space-y-3">
           <Logo alto={72} prioridad />
           <h1 className="text-2xl font-semibold">Mi cuenta</h1>
-          <p className="muted text-sm">Entrá con el código de cliente y la clave que te dio el taller.</p>
+          <p className="muted text-sm">Entrá con tu teléfono o email y tu clave.</p>
         </div>
         <label className="field">
-          <span>Código de cliente</span>
-          <input name="codigo" placeholder="MM-0001" required autoCapitalize="characters" autoComplete="username" className="font-mono uppercase" />
+          <span>Teléfono o email</span>
+          <input name="usuario" placeholder="11 2345 6789" required autoComplete="username" />
         </label>
         <label className="field">
           <span>Clave</span>
@@ -28,7 +28,7 @@ export default function IngresarClientePage({ searchParams }: { searchParams: Pr
         </label>
         {estado?.error && <p className="text-sm text-red-600">{estado.error}</p>}
         <button className="btn w-full" disabled={pendiente}>{pendiente ? "Ingresando…" : "Ingresar"}</button>
-        <p className="muted text-xs">¿No tenés cuenta? <Link href={volver ? `/registro?volver=${encodeURIComponent(volver)}` : "/registro"} className="link">Registrate</Link>. ¿No tenés clave? Pedísela al taller por WhatsApp. <Link href="/" className="link">Volver al inicio</Link></p>
+        <p className="muted text-xs">¿No tenés cuenta? <Link href={volver ? `/registro?volver=${encodeURIComponent(volver)}` : "/registro"} className="link">Registrate</Link>. ¿No tenés clave? Abrí el link que te mandamos por WhatsApp y creala desde “Mi cuenta”. <Link href="/" className="link">Volver al inicio</Link></p>
       </form>
     </main>
   );

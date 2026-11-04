@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Asesor } from "@/app/asesor/Asesor";
 
-const OCULTO_EN = ["/taller", "/login", "/asesor", "/checkout", "/mi-cuenta/ingresar"];
+const OCULTO_EN = ["/taller", "/login", "/asesor", "/checkout", "/mi-cuenta", "/seguimiento"];
 
 /** Botón fijo abajo a la derecha que abre el asesor en un panel tipo chat. */
 export function AsesorFlotante({ whatsapp }: { whatsapp: string | null }) {

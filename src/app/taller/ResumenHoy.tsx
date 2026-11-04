@@ -2,7 +2,7 @@ import Link from "next/link";
 import { appWhatsApp, linkSeguimiento } from "@/lib/estados";
 
 export type Listo = { id: string; numero: string; instrumento: string; cliente: string; telefono: string | null; token: string };
-export type Cifras = { enTaller: number; listos: number; pedidos: number; consultas: number };
+export type Cifras = { enTaller: number; listos: number; pedidos: number; consultas: number; chat: number };
 
 /** Inicio del panel: lo que hay que hacer hoy, de un vistazo. */
 export function ResumenHoy({ cifras, listos }: { cifras: Cifras; listos: Listo[] }) {
@@ -10,6 +10,7 @@ export function ResumenHoy({ cifras, listos }: { cifras: Cifras; listos: Listo[]
     { n: cifras.enTaller, t: "En el taller", d: "Trabajos en curso", href: "#tablero" },
     { n: cifras.listos, t: "Listos para retirar", d: "Avisale al cliente", href: "#listos", alerta: cifras.listos > 0 },
     { n: cifras.pedidos, t: "Pedidos para atender", d: "Sin pagar o por preparar", href: "/taller/pedidos", alerta: cifras.pedidos > 0 },
+    { n: cifras.chat, t: "Mensajes sin leer", d: "Chat con clientes", href: "/taller/mensajes", alerta: cifras.chat > 0 },
     { n: cifras.consultas, t: "Consultas nuevas", d: "Tasaciones y arrepentimientos", href: "/taller/consultas", alerta: cifras.consultas > 0 },
   ];
   return (
@@ -19,7 +20,7 @@ export function ResumenHoy({ cifras, listos }: { cifras: Cifras; listos: Listo[]
         <p className="muted text-sm">Lo que necesita tu atención. Tocá una tarjeta para ir directo.</p>
       </div>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         {tarjetas.map((c) => (
           <Link key={c.t} href={c.href} className="card !p-4 transition hover:-translate-y-0.5 hover:shadow-md"
             style={c.alerta ? { borderColor: "var(--accent)" } : undefined}>

@@ -27,11 +27,12 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
 
   // Resumen del día
   const n = (r: { count: number | null }) => r.count ?? 0;
-  const [enTaller, pedidos, tasaciones, arrep, { data: listosData }] = await Promise.all([
+  const [enTaller, pedidos, tasaciones, arrep, chat, { data: listosData }] = await Promise.all([
     supabase.from("trabajos").select("id", { count: "exact", head: true }).in("estado", ESTADOS_ACTIVOS),
     supabase.from("pedidos").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "a_cotizar", "pagado"]),
     supabase.from("tasaciones").select("id", { count: "exact", head: true }).eq("estado", "nueva"),
     supabase.from("arrepentimientos").select("id", { count: "exact", head: true }).eq("estado", "recibido"),
+    supabase.from("mensajes").select("id", { count: "exact", head: true }).eq("autor", "cliente").eq("leido_taller", false),
     supabase.from("trabajos").select("id, numero, clientes(nombre, telefono, token), instrumentos(tipo, marca, modelo)").eq("estado", "listo").order("actualizado_en").limit(20),
   ]);
   type FilaListo = { id: string; numero: string; clientes: { nombre: string; telefono: string | null; token: string } | null; instrumentos: { tipo: string; marca: string | null; modelo: string | null } | null };
@@ -43,7 +44,7 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="space-y-6">
-      <ResumenHoy cifras={{ enTaller: n(enTaller), listos: listos.length, pedidos: n(pedidos), consultas: n(tasaciones) + n(arrep) }} listos={listos} />
+      <ResumenHoy cifras={{ enTaller: n(enTaller), listos: listos.length, pedidos: n(pedidos), consultas: n(tasaciones) + n(arrep), chat: n(chat) }} listos={listos} />
       <div className="flex flex-wrap items-end gap-3">
         <div className="mr-auto">
           <h2 id="tablero" className="scroll-mt-20 text-xl font-semibold">Trabajos en el taller</h2>

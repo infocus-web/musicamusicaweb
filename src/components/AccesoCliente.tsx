@@ -16,17 +16,17 @@ export function AccesoCliente({ clienteId, codigo, nombre, telefono, tieneAcceso
   const [estado, accion, pendiente] = useActionState(generarClaveCliente.bind(null, clienteId), undefined);
 
   const mensaje = estado?.clave
-    ? `Hola ${nombre}! Ya podés entrar a tu cuenta de Música Música Web para seguir tus instrumentos.\n\nEntrá en: ${urlCuenta}\nCódigo: ${codigo}\nClave: ${estado.clave}\n\nDespués podés cambiar la clave desde tu cuenta.`
+    ? `Hola ${nombre}! Ya podés entrar a tu cuenta de Música Música Web para seguir tus instrumentos.\n\nEntrá en: ${urlCuenta}\nUsuario: tu teléfono (o el código ${codigo})\nClave: ${estado.clave}\n\nDespués podés cambiar la clave desde tu cuenta.`
     : "";
   let num = (telefono ?? "").replace(/\D/g, "");
   if (num && !num.startsWith("54")) num = "549" + num.replace(/^0/, "");
   const wa = `https://wa.me/${num}?text=${encodeURIComponent(mensaje)}`;
 
   return (
-    <section className="card space-y-3">
-      <h2 className="font-semibold">Acceso del cliente con clave</h2>
+    <section className="space-y-3 rounded-xl border p-3" style={{ borderColor: "var(--line)" }}>
+      <h2 className="font-semibold">Clave del cliente (opcional)</h2>
       <p className="muted text-sm">
-        El cliente entra en <span className="font-mono">{urlCuenta.replace(/^https?:\/\//, "")}</span> con su código <b className="font-mono">{codigo}</b> y una clave.
+        Solo si el cliente te pide una clave: entra en <span className="font-mono">{urlCuenta.replace(/^https?:\/\//, "")}</span> con su teléfono, email o código <b className="font-mono">{codigo}</b>.
         {tieneAcceso ? " Ya tiene clave creada." : " Todavía no tiene clave."}
       </p>
 

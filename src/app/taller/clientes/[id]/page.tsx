@@ -24,7 +24,7 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
   ]);
 
   const url = linkSeguimiento(c.token);
-  const mensaje = `Hola ${c.nombre}! Tu código de cliente en Música Música Web es ${c.codigo}. Podés seguir el avance de tus instrumentos acá: ${url}`;
+  const mensaje = `Hola ${c.nombre.split(" ")[0]}! Este es tu panel de cliente en Música Música Web 🎸\nAhí ves el estado de tus instrumentos con fotos y videos, nos podés escribir, aprobar presupuestos y pedir turno:\n${url}\n\nGuardalo, es personal.`;
   const nombreInstrumento = (iid: string | null) => {
     const i = instrumentos?.find((x) => x.id === iid);
     return i ? [i.tipo, i.marca, i.modelo].filter(Boolean).join(" · ") : "—";
@@ -45,27 +45,27 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
       )}
 
       <section className="card space-y-3">
-        <h2 className="font-semibold">Link privado de seguimiento</h2>
-        <p className="break-all font-mono text-sm">{url}</p>
+        <h2 className="font-semibold">Panel del cliente</h2>
+        <p className="muted text-sm">Mandale su link por WhatsApp: con eso entra directo a su panel (sin clave) para ver sus instrumentos, escribirte, aprobar presupuestos y pedir turno.</p>
         <div className="flex flex-wrap gap-2">
-          <CopiarLink url={url} />
-          <a className="btn" href={appWhatsApp(c.telefono, mensaje)}>Enviar por WhatsApp</a>
+          <a className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white" style={{ background: "#25D366" }} href={appWhatsApp(c.telefono, mensaje)}>Mandarle su panel por WhatsApp</a>
+          <Link className="btn" href={`/taller/mensajes/${c.id}`}>💬 Chat</Link>
           <Link className="btn-ghost" href={`/taller/recibir?cliente=${c.id}`}>+ Recibir instrumento</Link>
-          <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver como cliente</a>
-          <form action={regenerarLink.bind(null, c.id)}>
-            <button className="btn-ghost" title="El link anterior deja de funcionar">Generar link nuevo</button>
-          </form>
+          <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver su panel</a>
+          <CopiarLink url={url} />
         </div>
+        <p className="muted text-xs">{c.user_id ? "Ya creó su clave: también puede entrar con su teléfono o email en /mi-cuenta." : "Todavía no creó clave (es opcional; la crea él desde su panel)."}</p>
+        <details className="text-sm">
+          <summary className="muted cursor-pointer">Opciones avanzadas</summary>
+          <div className="mt-3 space-y-3">
+            <p className="break-all font-mono text-xs">{url}</p>
+            <form action={regenerarLink.bind(null, c.id)}>
+              <button className="btn-ghost !py-1.5 text-sm" title="El link anterior deja de funcionar">Generar link nuevo (el anterior deja de andar)</button>
+            </form>
+            <AccesoCliente clienteId={c.id} codigo={c.codigo} nombre={c.nombre} telefono={c.telefono} tieneAcceso={!!c.user_id} urlCuenta={`${siteUrl()}/mi-cuenta`} />
+          </div>
+        </details>
       </section>
-
-      <AccesoCliente
-        clienteId={c.id}
-        codigo={c.codigo}
-        nombre={c.nombre}
-        telefono={c.telefono}
-        tieneAcceso={!!c.user_id}
-        urlCuenta={`${siteUrl()}/mi-cuenta`}
-      />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="card space-y-4">

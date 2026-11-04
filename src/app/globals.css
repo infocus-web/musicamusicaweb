@@ -98,6 +98,6 @@ body {
 .tema-oscuro img { color-scheme: light; }
 
 /* En el panel del taller no va el pie de la web pública */
-body:has(#panel-taller) .pie-sitio { display: none; }
+body:has(#panel-taller) .pie-sitio, body:has(#panel-cliente) .pie-sitio { display: none; }
 /* Modo oscuro: el rojo de los links se aclara para que se lea sobre el gris */
 .tema-oscuro .link { color: #ff8080; }

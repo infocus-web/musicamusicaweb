@@ -6,7 +6,7 @@ import { EstadoBadge } from "@/components/EstadoBadge";
 import { SubirAvance } from "@/components/SubirAvance";
 import { Media } from "@/components/Media";
 import { BorrarAvance } from "@/components/BorrarAvance";
-import { actualizarTrabajo } from "../../actions";
+import { actualizarTrabajo, anularAprobacion, pedirAprobacion } from "../../actions";
 import { crearCasoDesdeTrabajo } from "../../nuestros-clientes/actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
@@ -21,6 +21,7 @@ export default async function TrabajoPage({ params, searchParams }: { params: Pr
     .maybeSingle();
   if (!t) notFound();
 
+  const { data: aprobaciones } = await supabase.from("aprobaciones").select("*").eq("trabajo_id", id).neq("estado", "anulada").order("creado_en", { ascending: false });
   const { data: avances } = await supabase.from("avances").select("*").eq("trabajo_id", id).order("creado_en", { ascending: false });
   const paths = (avances ?? []).map((a) => a.media_path).filter(Boolean) as string[];
   const firmadas = paths.length ? (await supabase.storage.from("avances").createSignedUrls(paths, 3600)).data ?? [] : [];
@@ -68,6 +69,7 @@ export default async function TrabajoPage({ params, searchParams }: { params: Pr
         <section className="space-y-4">
           <div className="flex flex-wrap gap-2">
             <a className="btn" href={appWhatsApp(t.clientes.telefono, aviso)}>Avisar por WhatsApp</a>
+            <Link className="btn-ghost" href={`/taller/mensajes/${t.clientes.id}`}>Chat del cliente</Link>
             <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver como cliente</a>
             {["listo", "entregado"].includes(t.estado) && (
               <form action={crearCasoDesdeTrabajo.bind(null, t.id)}><button className="btn-ghost">Mostrar en Nuestros clientes</button></form>
@@ -97,6 +99,31 @@ export default async function TrabajoPage({ params, searchParams }: { params: Pr
         </section>
 
         <aside className="space-y-6">
+          <section className="card space-y-3">
+            <h2 className="font-semibold">Pedir aprobación al cliente</h2>
+            <p className="muted text-xs">Le aparece en su panel con botones Aprobar / No aprobar. La orden pasa a “Esperando aprobación”.</p>
+            {(aprobaciones ?? []).map((a) => (
+              <div key={a.id} className="flex flex-wrap items-center gap-2 rounded-lg border p-2 text-sm" style={{ borderColor: "var(--line)" }}>
+                <span className="flex-1">{a.tipo === "ampliacion" ? "Ampliación" : "Presupuesto"} · <b>{formatoPesos(a.monto)}</b>
+                  {a.respuesta && <span className="muted block text-xs">“{a.respuesta}”</span>}</span>
+                <span className={`badge ${a.estado === "aprobada" ? "bg-emerald-100 text-emerald-800" : a.estado === "rechazada" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-800"}`}>{a.estado === "pendiente" ? "Esperando" : a.estado}</span>
+                {a.estado === "pendiente" && <form action={anularAprobacion.bind(null, a.id, t.id)}><button className="muted text-xs hover:underline">Anular</button></form>}
+              </div>
+            ))}
+            <form action={pedirAprobacion.bind(null, t.id)} className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <label className="field"><span>Qué pedís</span>
+                  <select name="tipo" defaultValue={t.presupuesto_aprobado ? "ampliacion" : "presupuesto"}>
+                    <option value="presupuesto">Presupuesto</option><option value="ampliacion">Ampliación</option>
+                  </select>
+                </label>
+                <label className="field"><span>Monto ($)</span><input name="monto" inputMode="decimal" required defaultValue={t.presupuesto_aprobado ? "" : t.presupuesto ?? ""} /></label>
+              </div>
+              <label className="field"><span>Detalle para el cliente</span><textarea name="detalle" rows={2} placeholder="Ej.: hay que cambiar el jack y dos trastes" /></label>
+              <BotonGuardar className="btn w-full">Enviar al cliente</BotonGuardar>
+            </form>
+          </section>
+
           <SubirAvance trabajoId={t.id} />
 
           <form action={actualizarTrabajo.bind(null, t.id)} className="card space-y-3">

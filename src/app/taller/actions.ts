@@ -289,3 +289,39 @@ export async function recibirInstrumento(fd: FormData) {
   revalidatePath("/taller");
   redirect(`/taller/trabajos/${t.id}?recibido=1`);
 }
+
+/**
+ * Pide al cliente que apruebe el presupuesto o una ampliación. Le aparece en su panel con botones
+ * Aprobar / No aprobar; la orden pasa a "Esperando aprobación" y queda un mensaje en el chat.
+ */
+export async function pedirAprobacion(trabajoId: string, fd: FormData) {
+  const supabase = await createClient();
+  const tipo = fd.get("tipo") === "ampliacion" ? "ampliacion" : "presupuesto";
+  const monto = num(fd, "monto");
+  if (monto == null || monto < 0) throw new Error("Cargá el monto.");
+  const detalle = txt(fd, "detalle");
+  const { data: t } = await supabase.from("trabajos").select("id, numero, cliente_id, estado").eq("id", trabajoId).single();
+  if (!t) throw new Error("Orden no encontrada.");
+
+  // Si había otra del mismo tipo esperando, queda anulada (vale la última).
+  await supabase.from("aprobaciones").update({ estado: "anulada" }).eq("trabajo_id", trabajoId).eq("tipo", tipo).eq("estado", "pendiente");
+  const { error } = await supabase.from("aprobaciones").insert({ trabajo_id: trabajoId, tipo, monto, detalle });
+  if (error) throw new Error(error.message);
+
+  if (t.estado !== "esperando_aprobacion") {
+    await supabase.from("trabajos").update({ estado: "esperando_aprobacion" }).eq("id", trabajoId);
+    await supabase.from("avances").insert({ trabajo_id: trabajoId, estado: "esperando_aprobacion", descripcion: tipo === "ampliacion" ? "Te pedimos que apruebes una ampliación del presupuesto." : "Te pasamos el presupuesto para que lo apruebes." });
+  }
+  const { formatoPesos } = await import("@/lib/estados");
+  await supabase.from("mensajes").insert({
+    cliente_id: t.cliente_id, trabajo_id: trabajoId, autor: "taller", tipo: "aprobacion", leido_taller: true,
+    texto: `${tipo === "ampliacion" ? "🔧 Necesitamos ampliar el presupuesto" : "📋 Te pasamos el presupuesto"} de la orden ${t.numero}: ${formatoPesos(monto)}.${detalle ? `\n${detalle}` : ""}\nPodés aprobarlo desde el Inicio de tu panel.`,
+  });
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
+
+export async function anularAprobacion(id: string, trabajoId: string) {
+  const supabase = await createClient();
+  await supabase.from("aprobaciones").update({ estado: "anulada" }).eq("id", id).eq("estado", "pendiente");
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
