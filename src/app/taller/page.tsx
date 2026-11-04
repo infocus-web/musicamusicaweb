@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADOS, ESTADOS_ACTIVOS, formatoFecha } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
+import { ResumenHoy, type Listo } from "./ResumenHoy";
 
 type Fila = {
   id: string; numero: string; servicio: string; estado: string; fecha_ingreso: string; fecha_estimada: string | null;
@@ -24,28 +25,28 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
 
   const columnas = ESTADOS.filter((e) => todos || ESTADOS_ACTIVOS.includes(e.id));
 
-  const accesos = [
-    ["/taller/imagenes", "Imágenes y videos", "Banner, categorías y videos"],
-    ["/taller/tienda", "Tienda", "Productos, precios y stock"],
-    ["/taller/usados", "Usados", "Publicar y marcar vendidos"],
-    ["/taller/pedidos", "Pedidos", "Compras de la tienda"],
-    ["/taller/consultas", "Consultas", "Tasaciones y presupuestos"],
-    ["/taller/clientes", "Clientes", "Alta, CSV y link de registro"],
-  ];
+  // Resumen del día
+  const n = (r: { count: number | null }) => r.count ?? 0;
+  const [enTaller, pedidos, tasaciones, arrep, { data: listosData }] = await Promise.all([
+    supabase.from("trabajos").select("id", { count: "exact", head: true }).in("estado", ESTADOS_ACTIVOS),
+    supabase.from("pedidos").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "a_cotizar", "pagado"]),
+    supabase.from("tasaciones").select("id", { count: "exact", head: true }).eq("estado", "nueva"),
+    supabase.from("arrepentimientos").select("id", { count: "exact", head: true }).eq("estado", "recibido"),
+    supabase.from("trabajos").select("id, numero, clientes(nombre, telefono, token), instrumentos(tipo, marca, modelo)").eq("estado", "listo").order("actualizado_en").limit(20),
+  ]);
+  type FilaListo = { id: string; numero: string; clientes: { nombre: string; telefono: string | null; token: string } | null; instrumentos: { tipo: string; marca: string | null; modelo: string | null } | null };
+  const listos: Listo[] = ((listosData ?? []) as unknown as FilaListo[]).map((l) => ({
+    id: l.id, numero: l.numero,
+    instrumento: [l.instrumentos?.tipo, l.instrumentos?.marca, l.instrumentos?.modelo].filter(Boolean).join(" ") || "instrumento",
+    cliente: l.clientes?.nombre ?? "", telefono: l.clientes?.telefono ?? null, token: l.clientes?.token ?? "",
+  }));
 
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {accesos.map(([href, t, d]) => (
-          <Link key={href} href={href} className="card !p-4 transition hover:-translate-y-0.5 hover:shadow-md">
-            <p className="font-semibold">{t}</p>
-            <p className="muted text-xs">{d}</p>
-          </Link>
-        ))}
-      </section>
+      <ResumenHoy cifras={{ enTaller: n(enTaller), listos: listos.length, pedidos: n(pedidos), consultas: n(tasaciones) + n(arrep) }} listos={listos} />
       <div className="flex flex-wrap items-end gap-3">
         <div className="mr-auto">
-          <h1 className="text-2xl font-semibold">Trabajos en el taller</h1>
+          <h2 id="tablero" className="scroll-mt-20 text-xl font-semibold">Trabajos en el taller</h2>
           <p className="muted text-sm">{trabajos.length} trabajo(s){todos ? "" : " en curso"}</p>
         </div>
         <form className="flex gap-2">
@@ -56,7 +57,6 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
         <Link href={todos ? "/taller" : "/taller?todos=1"} className="btn-ghost">
           {todos ? "Solo en curso" : "Ver todos"}
         </Link>
-        <Link href="/taller/recibir" className="btn">+ Recibir instrumento</Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

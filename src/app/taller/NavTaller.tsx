@@ -1,35 +1,110 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const LINKS = [
-  { href: "/taller", label: "Trabajos", activo: (p: string) => p === "/taller" || p.startsWith("/taller/trabajos") },
-  { href: "/taller/clientes", label: "Clientes" },
-  { href: "/taller/tienda", label: "Tienda" },
-  { href: "/taller/pedidos", label: "Pedidos" },
-  { href: "/taller/usados", label: "Usados" },
-  { href: "/taller/consultas", label: "Consultas" },
-  { href: "/taller/nuestros-clientes", label: "Nuestros clientes" },
-  { href: "/taller/imagenes", label: "Imágenes y videos" },
-  { href: "/taller/equipo", label: "Equipo", admin: true },
-  { href: "/taller/ajustes", label: "Ajustes", admin: true },
+export type Contadores = { pedidos: number; consultas: number; clientesNuevos: number; listos: number };
+
+type Item = { href: string; label: string; icono: keyof typeof ICONOS; admin?: boolean; contador?: keyof Contadores; activo?: (p: string) => boolean };
+
+const GRUPOS: { titulo: string; items: Item[] }[] = [
+  { titulo: "Taller", items: [
+    { href: "/taller", label: "Trabajos", icono: "llave", contador: "listos", activo: (p) => p === "/taller" || p.startsWith("/taller/trabajos") },
+    { href: "/taller/clientes", label: "Clientes", icono: "personas", contador: "clientesNuevos" },
+  ] },
+  { titulo: "Ventas", items: [
+    { href: "/taller/pedidos", label: "Pedidos", icono: "caja", contador: "pedidos" },
+    { href: "/taller/tienda", label: "Productos", icono: "etiqueta" },
+    { href: "/taller/usados", label: "Usados", icono: "guitarra" },
+  ] },
+  { titulo: "Mensajes", items: [
+    { href: "/taller/consultas", label: "Consultas", icono: "sobre", contador: "consultas" },
+  ] },
+  { titulo: "La web", items: [
+    { href: "/taller/imagenes", label: "Portada e imágenes", icono: "foto" },
+    { href: "/taller/nuestros-clientes", label: "Nuestros clientes", icono: "estrella" },
+    { href: "/taller/ajustes", label: "Ajustes y textos", icono: "engranaje", admin: true },
+    { href: "/taller/equipo", label: "Equipo", icono: "escudo", admin: true },
+  ] },
 ];
 
-/** Menú del panel: la sección donde estás queda en rojo y subrayada. */
-export function NavTaller({ esAdmin }: { esAdmin: boolean }) {
-  const p = usePathname();
-  return (
-    <>
-      {LINKS.filter((l) => !l.admin || esAdmin).map((l) => {
-        const activo = l.activo ? l.activo(p) : p === l.href || p.startsWith(l.href + "/");
+const p = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+const ICONOS = {
+  llave: <path {...p} d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z" />,
+  personas: <g {...p}><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c.5-3.5 3.3-5.5 6.5-5.5s6 2 6.5 5.5" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.3 2.5 3.5 5.2" /></g>,
+  caja: <g {...p}><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" /><path d="M3 7.5 12 12l9-4.5M12 12v9" /></g>,
+  etiqueta: <g {...p}><path d="M3 12V3h9l9 9-9 9z" /><circle cx="7.5" cy="7.5" r="1.3" /></g>,
+  guitarra: <g {...p}><path d="m14 10 6-6M18 2l4 4" /><path d="M11.5 9.5c-2-1-4.5-.5-5.5 1.5-.6 1.2-2 1.2-3 2.5-1.5 2 0 5 2 6.5s4.5 3.5 6.5 2 1.3-2.4 2.5-3c2-1 2.5-3.5 1.5-5.5" /><circle cx="9.5" cy="14.5" r="1.3" /></g>,
+  sobre: <g {...p}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></g>,
+  foto: <g {...p}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="m21 16-5-5-9 9" /></g>,
+  estrella: <path {...p} d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z" />,
+  engranaje: <g {...p}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></g>,
+  escudo: <path {...p} d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" />,
+};
+
+/** Menú lateral del panel, agrupado, con contadores de pendientes. En el celular se abre con el botón ☰. */
+export function NavTaller({ esAdmin, contadores, pie }: { esAdmin: boolean; contadores: Contadores; pie: React.ReactNode }) {
+  const ruta = usePathname();
+  const [abierto, setAbierto] = useState(false);
+  useEffect(() => setAbierto(false), [ruta]);
+
+  const menu = (
+    <nav aria-label="Menú del taller" className="flex h-full flex-col gap-5 overflow-y-auto p-4">
+      <Link href="/taller/recibir" className="btn flex items-center justify-center gap-2 !py-2.5 text-sm font-bold">
+        <span className="text-lg leading-none">+</span> Recibir instrumento
+      </Link>
+      {GRUPOS.map((g) => {
+        const items = g.items.filter((i) => !i.admin || esAdmin);
+        if (!items.length) return null;
         return (
-          <Link key={l.href} href={l.href} aria-current={activo ? "page" : undefined}
-            className={activo ? "font-semibold underline decoration-2 underline-offset-[6px]" : "muted hover:underline"}
-            style={activo ? { color: "var(--accent)" } : undefined}>
-            {l.label}
-          </Link>
+          <div key={g.titulo}>
+            <p className="muted mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-widest">{g.titulo}</p>
+            <ul className="space-y-0.5">
+              {items.map((i) => {
+                const activo = i.activo ? i.activo(ruta) : ruta === i.href || ruta.startsWith(i.href + "/");
+                const n = i.contador ? contadores[i.contador] : 0;
+                return (
+                  <li key={i.href}>
+                    <Link href={i.href} aria-current={activo ? "page" : undefined}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition"
+                      style={activo ? { background: "color-mix(in srgb, var(--accent) 12%, transparent)", color: "var(--accent)", fontWeight: 600 } : undefined}>
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" aria-hidden>{ICONOS[i.icono]}</svg>
+                      <span className="flex-1">{i.label}</span>
+                      {n > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold text-white" style={{ background: "var(--accent)" }} aria-label={`${n} pendientes`}>{n}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         );
       })}
+      <div className="mt-auto border-t pt-4" style={{ borderColor: "var(--line)" }}>{pie}</div>
+    </nav>
+  );
+
+  return (
+    <>
+      {/* Barra superior solo en celular */}
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b px-4 py-2.5 lg:hidden" style={{ borderColor: "var(--line)", background: "var(--bg)" }}>
+        <button type="button" onClick={() => setAbierto(true)} aria-label="Abrir menú" aria-expanded={abierto} className="-ml-1 p-1">
+          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <span className="font-semibold">Taller</span>
+        {contadores.pedidos + contadores.consultas > 0 && <span className="h-2 w-2 rounded-full" style={{ background: "var(--accent)" }} aria-label="Hay pendientes" />}
+        <Link href="/taller/recibir" className="btn ml-auto !px-3 !py-1.5 text-sm">+ Recibir</Link>
+      </div>
+
+      {/* Lateral fijo en computadora */}
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-64 border-r lg:block" style={{ borderColor: "var(--line)", background: "var(--card)" }}>{menu}</aside>
+
+      {/* Cajón en celular */}
+      {abierto && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setAbierto(false)} />
+          <aside className="absolute inset-y-0 left-0 w-72 shadow-2xl" style={{ background: "var(--card)" }}>{menu}</aside>
+        </div>
+      )}
     </>
   );
 }

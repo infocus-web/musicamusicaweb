@@ -82,17 +82,22 @@ body {
 
 /* ---------- Panel del taller en modo oscuro (botón luna) ---------- */
 .tema-oscuro {
-  --bg: #0f0f11;
-  --fg: #ececee;
-  --muted: #a1a1aa;
-  --card: #18181b;
-  --line: #2f2f35;
-  --soft: #232328;
+  --bg: #2b2d31;   /* gris oscuro (no negro) */
+  --fg: #f1f2f4;
+  --muted: #b5b8bf;
+  --card: #34363c;
+  --line: #4a4d55;
+  --soft: #3d4047;
   color-scheme: dark;
   background: var(--bg);
   color: var(--fg);
 }
 .tema-oscuro .bg-white { background-color: var(--card); }
-.tema-oscuro .bg-zinc-200 { background-color: #2f2f35; }
+.tema-oscuro .bg-zinc-200 { background-color: #4a4d55; }
 .tema-oscuro .text-zinc-700, .tema-oscuro .text-zinc-800 { color: #d4d4d8; }
 .tema-oscuro img { color-scheme: light; }
+
+/* En el panel del taller no va el pie de la web pública */
+body:has(#panel-taller) .pie-sitio { display: none; }
+/* Modo oscuro: el rojo de los links se aclara para que se lea sobre el gris */
+.tema-oscuro .link { color: #ff8080; }

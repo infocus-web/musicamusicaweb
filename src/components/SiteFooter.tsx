@@ -12,7 +12,7 @@ export async function SiteFooter() {
     </div>
   );
   return (
-    <footer className="mt-16 bg-zinc-950 text-zinc-100">
+    <footer className="pie-sitio mt-16 bg-zinc-950 text-zinc-100">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <Col titulo="Links">
           <li><Link href="/contacto" className="hover:underline">Contacto</Link></li>
