@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { appWhatsApp, formatoFechaHora } from "@/lib/estados";
+import { obtenerAjustes } from "@/lib/ajustes";
+import { obtenerStaff } from "@/lib/auth";
+import { guardarAjustes } from "../ajustes/actions";
+import { BotonGuardar } from "@/components/BotonGuardar";
 
 type Fila = { cliente_id: string; texto: string; autor: string; tipo: string; creado_en: string; leido_taller: boolean; clientes: { nombre: string; codigo: string; telefono: string | null } | null };
 
@@ -16,6 +20,8 @@ export default async function MensajesPage() {
     if (!e) porCliente.set(m.cliente_id, { ultimo: m, sinLeer: m.autor === "cliente" && !m.leido_taller ? 1 : 0 });
     else if (m.autor === "cliente" && !m.leido_taller) e.sinLeer++;
   }
+  const { staff } = await obtenerStaff();
+  const rapidas = (await obtenerAjustes()).respuestas_rapidas ?? "";
   const conversaciones = [...porCliente.entries()].sort((a, b) => (b[1].sinLeer > 0 ? 1 : 0) - (a[1].sinLeer > 0 ? 1 : 0));
 
   return (
@@ -44,6 +50,16 @@ export default async function MensajesPage() {
           </div>
         ))}
       </div>
+      {staff?.rol === "admin" && (
+        <details className="card">
+          <summary className="cursor-pointer font-semibold">Respuestas rápidas del chat</summary>
+          <form action={guardarAjustes} className="mt-3 space-y-2">
+            <p className="muted text-xs">Una por línea. Aparecen como botones arriba del cuadro de texto cuando le escribís a un cliente.</p>
+            <textarea name="respuestas_rapidas" rows={6} defaultValue={rapidas} className="w-full rounded-xl border p-3 text-sm" style={{ borderColor: "var(--line)", background: "var(--bg)" }} />
+            <BotonGuardar />
+          </form>
+        </details>
+      )}
     </div>
   );
 }

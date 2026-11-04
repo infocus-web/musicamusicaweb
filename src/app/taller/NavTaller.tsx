@@ -3,13 +3,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export type Contadores = { pedidos: number; consultas: number; clientesNuevos: number; listos: number; chat: number };
+export type Contadores = { pedidos: number; consultas: number; clientesNuevos: number; listos: number; chat: number; avisos: number; turnos: number };
 
 type Item = { href: string; label: string; icono: keyof typeof ICONOS; admin?: boolean; contador?: keyof Contadores; activo?: (p: string) => boolean };
 
 const GRUPOS: { titulo: string; items: Item[] }[] = [
   { titulo: "Taller", items: [
     { href: "/taller", label: "Trabajos", icono: "llave", contador: "listos", activo: (p) => p === "/taller" || p.startsWith("/taller/trabajos") },
+    { href: "/taller/turnos", label: "Turnos", icono: "calendario", contador: "turnos" },
     { href: "/taller/clientes", label: "Clientes", icono: "personas", contador: "clientesNuevos" },
   ] },
   { titulo: "Ventas", items: [
@@ -19,6 +20,7 @@ const GRUPOS: { titulo: string; items: Item[] }[] = [
     { href: "/taller/usados", label: "Usados", icono: "guitarra" },
   ] },
   { titulo: "Mensajes", items: [
+    { href: "/taller/avisos", label: "Avisos por WhatsApp", icono: "whatsapp", contador: "avisos" },
     { href: "/taller/mensajes", label: "Chat con clientes", icono: "chat", contador: "chat" },
     { href: "/taller/consultas", label: "Consultas de la web", icono: "sobre", contador: "consultas" },
   ] },
@@ -42,6 +44,8 @@ const ICONOS = {
   foto: <g {...p}><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="m21 16-5-5-9 9" /></g>,
   estrella: <path {...p} d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z" />,
   engranaje: <g {...p}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></g>,
+  calendario: <g {...p}><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></g>,
+  whatsapp: <g {...p}><path d="M3.5 20.5l1.3-4.6A8.5 8.5 0 1 1 8 19.3z" /><path d="M9 9.5c.3 1.8 2.6 4.4 4.9 5 .7.2 1.6-.3 1.8-1l-1.5-1-1 .6c-.9-.4-1.9-1.4-2.3-2.3l.6-1-1-1.5c-.7.2-1.2 1.1-1 1.7z" /></g>,
   grafico: <g {...p}><path d="M3 3v18h18" /><path d="M7 15l4-5 3 3 5-7" /></g>,
   chat: <g {...p}><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z" /><path d="M8.5 11h7M8.5 14h4" /></g>,
   megafono: <g {...p}><path d="M3 10v4a1 1 0 0 0 1 1h3l7 4V5L7 9H4a1 1 0 0 0-1 1z" /><path d="M18 9a4 4 0 0 1 0 6" /></g>,
@@ -98,7 +102,7 @@ export function NavTaller({ esAdmin, contadores, pie }: { esAdmin: boolean; cont
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
         <span className="font-semibold">Taller</span>
-        {contadores.pedidos + contadores.consultas + contadores.chat > 0 && <span className="h-2 w-2 rounded-full" style={{ background: "var(--accent)" }} aria-label="Hay pendientes" />}
+        {contadores.pedidos + contadores.consultas + contadores.chat + contadores.avisos + contadores.turnos > 0 && <span className="h-2 w-2 rounded-full" style={{ background: "var(--accent)" }} aria-label="Hay pendientes" />}
         <Link href="/taller/recibir" className="btn ml-auto !px-3 !py-1.5 text-sm">+ Recibir</Link>
       </div>
 

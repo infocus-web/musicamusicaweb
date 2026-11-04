@@ -12,15 +12,17 @@ import { NavTaller, type Contadores } from "./NavTaller";
 async function contar(): Promise<Contadores> {
   const supabase = await createClient();
   const n = (r: { count: number | null }) => r.count ?? 0;
-  const [pedidos, tasaciones, arrep, clientes, listos, chat] = await Promise.all([
+  const [pedidos, tasaciones, arrep, clientes, listos, chat, turnos, { data: avisos }] = await Promise.all([
     supabase.from("pedidos").select("id", { count: "exact", head: true }).in("estado", ["pendiente", "a_cotizar", "pagado"]),
     supabase.from("tasaciones").select("id", { count: "exact", head: true }).eq("estado", "nueva"),
     supabase.from("arrepentimientos").select("id", { count: "exact", head: true }).eq("estado", "recibido"),
     supabase.from("clientes").select("id", { count: "exact", head: true }).eq("revisado", false),
     supabase.from("trabajos").select("id", { count: "exact", head: true }).eq("estado", "listo"),
     supabase.from("mensajes").select("id", { count: "exact", head: true }).eq("autor", "cliente").eq("leido_taller", false),
+    supabase.from("turnos").select("id", { count: "exact", head: true }).eq("estado", "pedido"),
+    supabase.from("avisos").select("cliente_id").is("enviado_en", null).eq("descartado", false).limit(1000),
   ]);
-  return { pedidos: n(pedidos), consultas: n(tasaciones) + n(arrep), clientesNuevos: n(clientes), listos: n(listos), chat: n(chat) };
+  return { pedidos: n(pedidos), consultas: n(tasaciones) + n(arrep), clientesNuevos: n(clientes), listos: n(listos), chat: n(chat), turnos: n(turnos), avisos: new Set((avisos ?? []).map((a) => a.cliente_id)).size };
 }
 
 export default async function TallerLayout({ children }: { children: React.ReactNode }) {

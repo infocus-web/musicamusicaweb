@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ESTADOS_ACTIVOS, appWhatsApp, linkSeguimiento } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { ChatTaller } from "./ChatTaller";
+import { obtenerAjustes } from "@/lib/ajustes";
 
 export default async function ChatClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,6 +17,7 @@ export default async function ChatClientePage({ params }: { params: Promise<{ id
     const i = t.instrumentos as unknown as { tipo: string; marca: string | null; modelo: string | null } | null;
     return { id: t.id, numero: t.numero, estado: t.estado, nombre: `${[i?.tipo, i?.marca, i?.modelo].filter(Boolean).join(" ")} (${t.numero})` };
   });
+  const rapidas = ((await obtenerAjustes()).respuestas_rapidas ?? "").split("\n").map((r) => r.trim()).filter(Boolean);
   const aviso = `Hola ${c.nombre.split(" ")[0]}! Te respondimos en tu panel de Música Música Web: ${linkSeguimiento(c.token)}?tab=mensajes`;
 
   return (
@@ -40,7 +42,7 @@ export default async function ChatClientePage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      <ChatTaller clienteId={c.id} ordenes={ordenes.map((o) => ({ id: o.id, nombre: o.nombre }))} />
+      <ChatTaller clienteId={c.id} rapidas={rapidas} ordenes={ordenes.map((o) => ({ id: o.id, nombre: o.nombre }))} />
       <p className="muted text-xs">
         El cliente ve tu respuesta en su panel. Si querés que se entere enseguida,{" "}
         <a className="link" href={appWhatsApp(c.telefono, aviso)}>avisale por WhatsApp que le respondiste</a>.

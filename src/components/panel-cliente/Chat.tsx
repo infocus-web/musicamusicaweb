@@ -10,13 +10,14 @@ const hora = (d: string) => new Date(d).toLocaleString("es-AR", { day: "2-digit"
  * Chat reutilizable (cliente y taller). Se actualiza solo cada pocos segundos.
  * `yo` indica de qué lado está quien mira: sus mensajes van a la derecha.
  */
-export function Chat({ yo, leer, enviar, ordenes = [], vacio, alto = "h-[60vh]" }: {
+export function Chat({ yo, leer, enviar, ordenes = [], vacio, alto = "h-[60vh]", rapidas = [] }: {
   yo: "cliente" | "taller";
   leer: () => Promise<MensajeChat[] | null>;
   enviar: (texto: string, trabajoId: string | null) => Promise<{ ok: boolean; error?: string }>;
   ordenes?: { id: string; nombre: string }[];
   vacio?: string;
   alto?: string;
+  rapidas?: string[];
 }) {
   const [mensajes, setMensajes] = useState<MensajeChat[] | null>(null);
   const [texto, setTexto] = useState("");
@@ -81,6 +82,16 @@ export function Chat({ yo, leer, enviar, ordenes = [], vacio, alto = "h-[60vh]" 
             <option value="">Mensaje general</option>
             {ordenes.map((o) => <option key={o.id} value={o.id}>Sobre: {o.nombre}</option>)}
           </select>
+        )}
+        {rapidas.length > 0 && (
+          <div className="sin-barra -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" aria-label="Respuestas rápidas">
+            {rapidas.map((r) => (
+              <button key={r} type="button" onClick={() => setTexto((t) => (t ? `${t} ${r}` : r))}
+                className="shrink-0 rounded-full border px-3 py-1 text-xs hover:bg-[var(--soft)]" style={{ borderColor: "var(--line)" }} title={r}>
+                {r.length > 38 ? r.slice(0, 36) + "…" : r}
+              </button>
+            ))}
+          </div>
         )}
         <div className="flex items-end gap-2">
           <textarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={2} placeholder="Escribí tu mensaje…" aria-label="Mensaje"

@@ -70,6 +70,7 @@ export async function pedirTurno(token: string | null, _p: { ok?: boolean; error
   const dia = new Date(fecha + "T12:00:00").toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
   const texto = `📅 Pedido de turno\nDía: ${dia}${franja ? ` · ${franja}` : ""}\n${modo ? `Cómo: ${modo}\n` : ""}${motivo ? `Motivo: ${motivo}` : ""}`.trim();
   if (!(await guardarMensaje(c.id, texto, "turno"))) return { error: "No se pudo enviar. Probá de nuevo." };
+  await createAdminClient().from("turnos").insert({ cliente_id: c.id, fecha, franja: franja || null, modo: modo || null, motivo: motivo || null });
   await avisarTaller(c.id, c.nombre, c.codigo, texto);
   return { ok: true };
 }

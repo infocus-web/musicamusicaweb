@@ -146,6 +146,7 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
 
       {activa === "turno" && (
         <section className="space-y-3">
+          <TusTurnos clienteId={cliente.id} />
           <p className="muted text-sm">Atendemos con turno. Elegí cuándo te queda bien y te confirmamos por el chat.</p>
           <FormTurno token={token} />
         </section>
@@ -171,6 +172,23 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
 
       {token && <p className="muted text-center text-xs">Este link es personal: no lo compartas.</p>}
     </div>
+    </div>
+  );
+}
+
+async function TusTurnos({ clienteId }: { clienteId: string }) {
+  const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+  const { data } = await createAdminClient().from("turnos").select("id, fecha, hora, franja, estado")
+    .eq("cliente_id", clienteId).in("estado", ["pedido", "confirmado"]).gte("fecha", hoy).order("fecha");
+  if (!data?.length) return null;
+  return (
+    <div className="card space-y-2">
+      <h2 className="font-semibold">Tus turnos</h2>
+      <ul className="space-y-1.5 text-sm">{data.map((t) => (
+        <li key={t.id} className="flex flex-wrap items-center gap-2">
+          <span className="capitalize">{new Date(t.fecha + "T12:00:00").toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" })}{t.hora ? ` · ${t.hora} h` : t.franja ? ` · ${t.franja}` : ""}</span>
+          <span className={`badge ${t.estado === "confirmado" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{t.estado === "confirmado" ? "Confirmado" : "Esperando confirmación"}</span>
+        </li>))}</ul>
     </div>
   );
 }
