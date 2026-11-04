@@ -115,10 +115,7 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Tus instrumentos en el taller</h2>
             {activos.length === 0 && (
-              <div className="card space-y-2 text-sm">
-                <p>No tenés instrumentos en el taller ahora.</p>
-                <Link href={url("turno")} className="btn inline-flex">📅 Pedir turno</Link>
-              </div>
+              <p className="card muted text-sm">No tenés instrumentos en el taller ahora. Cuando quieras traer uno, pedí turno desde el menú.</p>
             )}
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {activos.map((t) => (
@@ -133,11 +130,6 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
               ))}
             </div>
           </section>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href={url("mensajes")} className="card !p-4 hover:shadow-md"><p className="text-2xl" aria-hidden>💬</p><p className="font-semibold">Escribile al taller</p><p className="muted text-sm">Dudas, cambios, lo que necesites</p></Link>
-            <Link href={url("turno")} className="card !p-4 hover:shadow-md"><p className="text-2xl" aria-hidden>📅</p><p className="font-semibold">Pedir turno</p><p className="muted text-sm">Traer, retirar o mandar tu instrumento</p></Link>
-          </div>
 
           <Novedades />
         </div>
