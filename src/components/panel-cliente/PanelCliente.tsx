@@ -12,12 +12,14 @@ import { ChatCliente } from "./ChatCliente";
 import { Aprobacion } from "./Aprobacion";
 import { FormTurno } from "./FormTurno";
 import { FormClave } from "./FormClave";
+import { ArmaTuInstrumento, type ArmadoUI } from "./ArmaTuInstrumento";
 import { cookies } from "next/headers";
 import { BotonTema } from "@/app/taller/BotonTema";
 
 const PESTANAS = [
   { id: "inicio", label: "Inicio", icono: "🏠" },
   { id: "instrumentos", label: "Mis instrumentos", icono: "🎸" },
+  { id: "armar", label: "Armá tu instrumento", icono: "🛠️" },
   { id: "mensajes", label: "Mensajes", icono: "💬" },
   { id: "turno", label: "Pedir turno", icono: "📅" },
   { id: "historial", label: "Historial", icono: "🧾" },
@@ -36,12 +38,14 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
 }) {
   const db = createAdminClient();
   const activa = PESTANAS.some((p) => p.id === tab) ? tab : "inicio";
-  const [{ data: trabajosData }, { count: sinLeer }, ajustes] = await Promise.all([
+  const [{ data: trabajosData }, { count: sinLeer }, ajustes, { data: armadosPresup }] = await Promise.all([
     db.from("trabajos").select("id, numero, servicio, estado, presupuesto, fecha_ingreso, fecha_entrega, instrumentos(tipo, marca, modelo)")
       .eq("cliente_id", cliente.id).neq("estado", "cancelado").order("fecha_ingreso", { ascending: false }),
     db.from("mensajes").select("id", { count: "exact", head: true }).eq("cliente_id", cliente.id).eq("autor", "taller").eq("leido_cliente", false),
     obtenerAjustes(),
+    db.from("armados").select("id, nombre, presupuesto").eq("cliente_id", cliente.id).eq("estado", "presupuestado"),
   ]);
+  const presupArmados = armadosPresup ?? [];
   const trabajos = (trabajosData ?? []) as unknown as Trabajo[];
   const activos = trabajos.filter((t) => (ESTADOS_ACTIVOS as string[]).includes(t.estado));
   const ids = trabajos.map((t) => t.id);
@@ -75,7 +79,7 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
       <div className="space-y-5 lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:items-start lg:gap-8 lg:space-y-0">
       <nav aria-label="Secciones de tu panel" className="sin-barra -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:sticky lg:top-6 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
         {PESTANAS.map((p) => {
-          const n = p.id === "mensajes" ? sinLeer ?? 0 : p.id === "inicio" ? pendientes.length : 0;
+          const n = p.id === "mensajes" ? sinLeer ?? 0 : p.id === "inicio" ? pendientes.length : p.id === "armar" ? presupArmados.length : 0;
           const sel = p.id === activa;
           return (
             <Link key={p.id} href={url(p.id)} aria-current={sel ? "page" : undefined}
@@ -104,6 +108,14 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
             </section>
           )}
 
+          {presupArmados.map((a) => (
+            <Link key={a.id} href={url("armar")} className="card flex items-center gap-3 !p-4" style={{ borderColor: "var(--accent)" }}>
+              <span className="text-2xl" aria-hidden>🛠️</span>
+              <span className="flex-1"><b>Ya tenés el presupuesto de “{a.nombre}”: {formatoPesos(Number(a.presupuesto))}</b><br /><span className="muted text-sm">Tocá para verlo y aprobarlo</span></span>
+              <span aria-hidden>→</span>
+            </Link>
+          ))}
+
           {(sinLeer ?? 0) > 0 && (
             <Link href={url("mensajes")} className="card flex items-center gap-3 !p-4" style={{ borderColor: "var(--accent)" }}>
               <span className="text-2xl" aria-hidden>💬</span>
@@ -131,11 +143,19 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
             </div>
           </section>
 
+          <Link href={url("armar")} className="card flex items-center gap-4 !p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+            <span className="text-3xl" aria-hidden>🛠️</span>
+            <span className="flex-1"><b>Armá tu instrumento</b><br /><span className="muted text-sm">Elegí cada parte (cuerpo, mástil, pastillas…) y te lo presupuestamos.</span></span>
+            <span className="btn !px-4 !py-2 text-sm">Empezar</span>
+          </Link>
+
           <Novedades />
         </div>
       )}
 
       {activa === "instrumentos" && <div className="space-y-4"><TrabajosCliente clienteId={cliente.id} token={token} /></div>}
+
+      {activa === "armar" && <Armados clienteId={cliente.id} token={token} />}
 
       {activa === "mensajes" && (
         <section className="space-y-2">
@@ -191,6 +211,26 @@ async function TusTurnos({ clienteId }: { clienteId: string }) {
         </li>))}</ul>
     </div>
   );
+}
+
+async function Armados({ clienteId, token }: { clienteId: string; token: string | null }) {
+  const { data } = await createAdminClient().from("armados")
+    .select("id, nombre, tipo, notas, estado, presupuesto, detalle_presupuesto, actualizado_en, armado_partes(id, parte, nombre, modelo, link, notas, precio, orden)")
+    .eq("cliente_id", clienteId).neq("estado", "cancelado").order("actualizado_en", { ascending: false });
+  type Fila = Omit<ArmadoUI, "partes"> & { armado_partes: (ArmadoUI["partes"][number] & { orden: number })[] };
+  // Los valores solo se muestran cuando el taller ya mandó el presupuesto (no mientras lo está armando).
+  const conValores = ["presupuestado", "aprobado", "rechazado"];
+  const armados: ArmadoUI[] = ((data ?? []) as unknown as Fila[]).map(({ armado_partes, ...a }) => {
+    const ver = conValores.includes(a.estado);
+    return {
+      ...a,
+      presupuesto: ver && a.presupuesto != null ? Number(a.presupuesto) : null,
+      detalle_presupuesto: ver ? a.detalle_presupuesto : null,
+      partes: [...(armado_partes ?? [])].sort((x, y) => x.orden - y.orden)
+        .map((p) => ({ id: p.id, parte: p.parte, nombre: p.nombre, modelo: p.modelo, link: p.link, notas: p.notas, precio: ver && p.precio != null ? Number(p.precio) : null })),
+    };
+  });
+  return <ArmaTuInstrumento token={token} armados={armados} />;
 }
 
 async function Novedades() {

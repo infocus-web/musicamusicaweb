@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export type Contadores = { pedidos: number; consultas: number; clientesNuevos: number; listos: number; chat: number; avisos: number; turnos: number };
+export type Contadores = { pedidos: number; consultas: number; clientesNuevos: number; listos: number; chat: number; avisos: number; turnos: number; armados: number };
 
 type Item = { href: string; label: string; icono: keyof typeof ICONOS; admin?: boolean; contador?: keyof Contadores; activo?: (p: string) => boolean };
 
@@ -12,6 +12,7 @@ const GRUPOS: { titulo: string; items: Item[] }[] = [
     { href: "/taller", label: "Trabajos", icono: "llave", contador: "listos", activo: (p) => p === "/taller" || p.startsWith("/taller/trabajos") },
     { href: "/taller/turnos", label: "Turnos", icono: "calendario", contador: "turnos" },
     { href: "/taller/clientes", label: "Clientes", icono: "personas", contador: "clientesNuevos" },
+    { href: "/taller/armados", label: "Armá tu instrumento", icono: "piezas", contador: "armados" },
   ] },
   { titulo: "Ventas", items: [
     { href: "/taller/gestion", label: "Gestión", icono: "grafico", admin: true },
@@ -49,6 +50,7 @@ const ICONOS = {
   grafico: <g {...p}><path d="M3 3v18h18" /><path d="M7 15l4-5 3 3 5-7" /></g>,
   chat: <g {...p}><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z" /><path d="M8.5 11h7M8.5 14h4" /></g>,
   megafono: <g {...p}><path d="M3 10v4a1 1 0 0 0 1 1h3l7 4V5L7 9H4a1 1 0 0 0-1 1z" /><path d="M18 9a4 4 0 0 1 0 6" /></g>,
+  piezas: <g {...p}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><path d="M17.5 14v7M14 17.5h7" /></g>,
   escudo: <path {...p} d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" />,
 };
 
@@ -102,7 +104,7 @@ export function NavTaller({ esAdmin, contadores, pie }: { esAdmin: boolean; cont
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
         <span className="font-semibold">Taller</span>
-        {contadores.pedidos + contadores.consultas + contadores.chat + contadores.avisos + contadores.turnos > 0 && <span className="h-2 w-2 rounded-full" style={{ background: "var(--accent)" }} aria-label="Hay pendientes" />}
+        {contadores.pedidos + contadores.consultas + contadores.chat + contadores.avisos + contadores.turnos + contadores.armados > 0 && <span className="h-2 w-2 rounded-full" style={{ background: "var(--accent)" }} aria-label="Hay pendientes" />}
         <Link href="/taller/recibir" className="btn ml-auto !px-3 !py-1.5 text-sm">+ Recibir</Link>
       </div>
 
