@@ -30,7 +30,7 @@ export function FormRegistro({ volver }: { volver?: string }) {
         </div>
         <p className="text-sm">Guardá este link: ahí vas a ver el avance de tus instrumentos cuando los traigas al taller.</p>
         {estado.volver
-          ? <a href={estado.volver} className="btn w-full">Continuar con mi pedido →</a>
+          ? <a href={estado.volver} className="btn w-full">Continuar →</a>
           : <a href={estado.link} className="btn w-full">Abrir mi seguimiento</a>}
         {estado.conClave && (
           <p className="muted text-sm">También podés entrar en <Link className="link" href="/mi-cuenta">Mi cuenta</Link> con tu código y la clave que elegiste.</p>

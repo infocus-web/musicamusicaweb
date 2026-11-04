@@ -12,7 +12,7 @@ export default async function MiCuentaPage({ searchParams }: { searchParams: Pro
   const { tab } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/mi-cuenta/ingresar");
+  if (!user) redirect(tab ? `/mi-cuenta/ingresar?volver=${encodeURIComponent(`/mi-cuenta?tab=${tab}`)}` : "/mi-cuenta/ingresar");
 
   const cliente = await resolverCliente(null);
   if (!cliente) {

@@ -16,6 +16,9 @@ export default async function RegistroPage({ searchParams }: { searchParams: Pro
         <Logo alto={64} prioridad />
         <h1 className="text-2xl font-semibold">Registrate como cliente</h1>
         <p className="muted">Te damos un código de cliente y un link privado para ver el avance de tus instrumentos, con fotos y videos.</p>
+        {volver?.startsWith("/mi-cuenta?tab=armar") && (
+          <p className="text-sm font-semibold" style={{ color: "var(--accent)" }}>🛠️ Al terminar seguís directo a “Armá tu instrumento”.</p>
+        )}
       </header>
       <FormRegistro volver={volver} />
     </main>

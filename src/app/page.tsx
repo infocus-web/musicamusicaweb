@@ -127,6 +127,7 @@ export default async function Home() {
               <div className="flex flex-wrap justify-center gap-3 pt-2 lg:justify-start">
                 <Link href={hero.link} className="inline-flex items-center rounded bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-red-700">{hero.boton}</Link>
                 <Link href="/mi-cuenta" className="inline-flex items-center rounded border border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">Ver mi instrumento</Link>
+                <Link href="/armar" className="inline-flex items-center rounded border border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">🛠️ Armá tu instrumento</Link>
               </div>
             </div>
           </div>
@@ -147,6 +148,15 @@ export default async function Home() {
               </Link>
             ))}
           </div>
+
+          {/* Armá tu instrumento: lleva a /armar (registro y después la pestaña "armar" del panel) */}
+          <Link href="/armar" className="group mx-auto mt-4 flex max-w-7xl flex-col gap-3 rounded-md border border-red-600/60 bg-gradient-to-r from-red-700/30 to-transparent p-5 text-white transition hover:border-red-500 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="titulo text-2xl">🛠️ Armá tu instrumento</p>
+              <p className="text-sm text-white/80">Elegí parte por parte cómo lo querés y pedile el presupuesto al taller desde tu cuenta.</p>
+            </div>
+            <span className="w-fit shrink-0 bg-red-600 px-3 py-1.5 text-xs font-bold uppercase group-hover:bg-red-700">Empezar a armar →</span>
+          </Link>
         </section>
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-14">
