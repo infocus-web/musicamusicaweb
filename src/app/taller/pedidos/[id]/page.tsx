@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADOS_PEDIDO, PAGOS, pesos } from "@/lib/tienda";
 import { formatoFechaHora, appWhatsApp, siteUrl } from "@/lib/estados";
-import { cancelar, cotizarEnvio, datosInternos, estadoPedido, marcarPagado } from "../actions";
+import { cancelar, comprobanteDePedido, cotizarEnvio, datosInternos, estadoPedido, marcarPagado } from "../actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
 export default async function PedidoTallerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -30,6 +30,7 @@ export default async function PedidoTallerPage({ params }: { params: Promise<{ i
         <span className={`badge ${e.color}`}>{e.label}</span>
         <a href={appWhatsApp(p.telefono, msg)} className="btn">WhatsApp al cliente</a>
         <a href={link} target="_blank" rel="noreferrer" className="btn-ghost">Ver como cliente</a>
+        {p.pago_estado === "aprobado" && <form action={comprobanteDePedido.bind(null, p.id)}><button className="btn-ghost">Comprobante</button></form>}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">

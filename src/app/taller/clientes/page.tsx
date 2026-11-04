@@ -4,17 +4,21 @@ import { createClient } from "@/lib/supabase/server";
 import { crearCliente } from "../actions";
 import { CopiarLink } from "@/components/CopiarLink";
 import { siteUrl } from "@/lib/estados";
+import { obtenerStaff } from "@/lib/auth";
+import { EliminarFila } from "./EliminarFila";
 
 export default async function ClientesPage({ searchParams }: { searchParams: Promise<{ q?: string; nuevos?: string }> }) {
   const { q, nuevos } = await searchParams;
   const supabase = await createClient();
-  let query = supabase.from("clientes").select("id, codigo, nombre, telefono, email, origen, revisado").order("creado_en", { ascending: false }).limit(200);
+  let query = supabase.from("clientes").select("id, codigo, nombre, telefono, email, origen, revisado, trabajos(count)").order("creado_en", { ascending: false }).limit(200);
   if (q) {
     const s = q.replace(/[%,()]/g, " ");
     query = query.or(`nombre.ilike.%${s}%,codigo.ilike.%${s}%,telefono.ilike.%${s}%`);
   }
   if (nuevos) query = query.eq("revisado", false);
   const { data: clientes } = await query;
+  const { staff } = await obtenerStaff();
+  const esAdmin = staff?.rol === "admin";
   const { count: sinRevisar } = await supabase.from("clientes").select("id", { count: "exact", head: true }).eq("revisado", false);
 
   const linkRegistro = `${siteUrl()}/registro`;
@@ -39,7 +43,7 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
         <div className="card overflow-x-auto p-0">
           <table className="w-full text-sm">
             <thead className="muted text-left">
-              <tr><th className="p-3">Código</th><th className="p-3">Nombre</th><th className="p-3">Teléfono</th><th className="p-3">Email</th></tr>
+              <tr><th className="p-3">Código</th><th className="p-3">Nombre</th><th className="p-3">Teléfono</th><th className="p-3">Email</th>{esAdmin && <th className="p-3"><span className="sr-only">Acciones</span></th>}</tr>
             </thead>
             <tbody>
               {(clientes ?? []).map((c) => (
@@ -51,10 +55,15 @@ export default async function ClientesPage({ searchParams }: { searchParams: Pro
                   </td>
                   <td className="p-3">{c.telefono ?? "—"}</td>
                   <td className="p-3">{c.email ?? "—"}</td>
+                  {esAdmin && (
+                    <td className="p-3 text-right">
+                      <EliminarFila id={c.id} codigo={c.codigo} trabajos={(c.trabajos as unknown as { count: number }[] | null)?.[0]?.count ?? 0} />
+                    </td>
+                  )}
                 </tr>
               ))}
               {(clientes ?? []).length === 0 && (
-                <tr><td colSpan={4} className="muted p-3">Todavía no hay clientes.</td></tr>
+                <tr><td colSpan={esAdmin ? 5 : 4} className="muted p-3">Todavía no hay clientes.</td></tr>
               )}
             </tbody>
           </table>

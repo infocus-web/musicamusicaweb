@@ -6,7 +6,9 @@ import { EstadoBadge } from "@/components/EstadoBadge";
 import { SubirAvance } from "@/components/SubirAvance";
 import { Media } from "@/components/Media";
 import { BorrarAvance } from "@/components/BorrarAvance";
-import { actualizarTrabajo, anularAprobacion, pedirAprobacion } from "../../actions";
+import { actualizarTrabajo, anularAprobacion, borrarCobro, comprobanteDeOrden, pedirAprobacion, quitarInsumo, registrarCobro, usarInsumo } from "../../actions";
+import { obtenerStaff } from "@/lib/auth";
+import { MEDIOS_PAGO, medioLabel } from "@/lib/gestion";
 import { crearCasoDesdeTrabajo } from "../../nuestros-clientes/actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
@@ -20,6 +22,21 @@ export default async function TrabajoPage({ params, searchParams }: { params: Pr
     .eq("id", id)
     .maybeSingle();
   if (!t) notFound();
+
+  const { staff } = await obtenerStaff();
+  const esAdmin = staff?.rol === "admin";
+  const [{ data: cobros }, { data: insumos }, { data: productos }, { data: comprobante }] = await Promise.all([
+    supabase.from("cobros").select("id, fecha, monto, medio, nota").eq("trabajo_id", id).order("fecha"),
+    supabase.from("trabajo_insumos").select("id, nombre, cantidad, precio").eq("trabajo_id", id).order("creado_en"),
+    supabase.from("productos").select("id, nombre, stock, tipo, variantes(id, nombre, stock)").eq("tipo", "producto").order("nombre").limit(1000),
+    supabase.from("comprobantes").select("id, numero").eq("trabajo_id", id).eq("anulado", false).maybeSingle(),
+  ]);
+  const cobrado = (cobros ?? []).reduce((a, c) => a + Number(c.monto), 0);
+  const saldo = Number(t.presupuesto ?? 0) - cobrado;
+  type Prod = { id: string; nombre: string; stock: number; variantes: { id: string; nombre: string; stock: number }[] };
+  const opcionesInsumo = ((productos ?? []) as unknown as Prod[]).flatMap((p) =>
+    p.variantes?.length ? p.variantes.map((v) => ({ valor: `${p.id}|${v.id}`, label: `${p.nombre} — ${v.nombre}`, stock: v.stock })) : [{ valor: `${p.id}|`, label: p.nombre, stock: p.stock }]);
+  const hoy = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
   const { data: aprobaciones } = await supabase.from("aprobaciones").select("*").eq("trabajo_id", id).neq("estado", "anulada").order("creado_en", { ascending: false });
   const { data: avances } = await supabase.from("avances").select("*").eq("trabajo_id", id).order("creado_en", { ascending: false });
@@ -99,6 +116,66 @@ export default async function TrabajoPage({ params, searchParams }: { params: Pr
         </section>
 
         <aside className="space-y-6">
+          <section className="card space-y-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="font-semibold">Cobros</h2>
+              {esAdmin && (comprobante
+                ? <Link href={`/taller/gestion/comprobantes/${comprobante.id}`} className="link text-xs">Comprobante N° {String(comprobante.numero).padStart(8, "0")}</Link>
+                : <form action={comprobanteDeOrden.bind(null, t.id)}><button className="link text-xs">Hacer comprobante</button></form>)}
+            </div>
+            <dl className="grid grid-cols-3 gap-2 text-center text-sm">
+              <div className="rounded-lg p-2" style={{ background: "var(--soft)" }}><dt className="muted text-xs">Presupuesto</dt><dd className="font-semibold">{formatoPesos(t.presupuesto)}</dd></div>
+              <div className="rounded-lg p-2" style={{ background: "var(--soft)" }}><dt className="muted text-xs">Cobrado</dt><dd className="font-semibold">{formatoPesos(cobrado)}</dd></div>
+              <div className="rounded-lg p-2" style={{ background: "var(--soft)" }}><dt className="muted text-xs">Saldo</dt><dd className={`font-semibold ${saldo > 0 ? "text-red-600" : ""}`}>{formatoPesos(Math.max(saldo, 0))}</dd></div>
+            </dl>
+            {(cobros ?? []).length > 0 && (
+              <ul className="space-y-1 text-sm">
+                {cobros!.map((c) => (
+                  <li key={c.id} className="flex items-center gap-2">
+                    <span className="muted text-xs">{formatoFecha(c.fecha)}</span>
+                    <span className="flex-1">{medioLabel(c.medio)}{c.nota ? ` · ${c.nota}` : ""}</span>
+                    <b>{formatoPesos(Number(c.monto))}</b>
+                    {esAdmin && <form action={borrarCobro.bind(null, c.id, t.id)}><button className="muted text-xs hover:text-red-600" aria-label="Borrar cobro">✕</button></form>}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <form action={registrarCobro.bind(null, t.id)} className="space-y-2 border-t pt-3" style={{ borderColor: "var(--line)" }}>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="field"><span>Monto ($)</span><input name="monto" inputMode="decimal" required defaultValue={saldo > 0 ? saldo : ""} /></label>
+                <label className="field"><span>Medio</span><select name="medio">{MEDIOS_PAGO.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></label>
+                <label className="field"><span>Fecha</span><input name="fecha" type="date" defaultValue={hoy} /></label>
+                <label className="field"><span>Nota</span><input name="nota" placeholder="Seña, saldo…" /></label>
+              </div>
+              <BotonGuardar className="btn w-full">Registrar cobro</BotonGuardar>
+            </form>
+          </section>
+
+          <section className="card space-y-3">
+            <h2 className="font-semibold">Insumos usados (descuentan stock)</h2>
+            {(insumos ?? []).length > 0 && (
+              <ul className="space-y-1 text-sm">
+                {insumos!.map((i) => (
+                  <li key={i.id} className="flex items-center gap-2">
+                    <span className="flex-1">{i.cantidad} × {i.nombre}</span>
+                    <span className="muted text-xs">{formatoPesos(Number(i.precio) * i.cantidad)}</span>
+                    <form action={quitarInsumo.bind(null, i.id, t.id)}><button className="muted text-xs hover:text-red-600" aria-label="Quitar y devolver al stock" title="Quitar y devolver al stock">✕</button></form>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {opcionesInsumo.length === 0 ? <p className="muted text-xs">Cargá productos en la Tienda para poder usarlos acá.</p> : (
+              <form action={usarInsumo.bind(null, t.id)} className="flex gap-2">
+                <select name="item" required className="min-w-0 flex-1 rounded-xl border px-2 py-2 text-sm" style={{ borderColor: "var(--line)", background: "var(--bg)" }}>
+                  <option value="">Elegí un insumo…</option>
+                  {opcionesInsumo.map((o) => <option key={o.valor} value={o.valor} disabled={o.stock <= 0}>{o.label} ({o.stock} en stock)</option>)}
+                </select>
+                <input name="cantidad" type="number" min={1} defaultValue={1} className="w-16 rounded-xl border px-2 py-2 text-sm" style={{ borderColor: "var(--line)", background: "var(--bg)" }} aria-label="Cantidad" />
+                <BotonGuardar className="btn !px-3">Usar</BotonGuardar>
+              </form>
+            )}
+          </section>
+
           <section className="card space-y-3">
             <h2 className="font-semibold">Pedir aprobación al cliente</h2>
             <p className="muted text-xs">Le aparece en su panel con botones Aprobar / No aprobar. La orden pasa a “Esperando aprobación”.</p>

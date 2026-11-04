@@ -26,6 +26,12 @@ export default async function AjustesPage() {
         <label className="field"><span>Horarios</span><input name="horarios" defaultValue={a.horarios ?? ""} placeholder="Lun a Vie 10 a 19 h · Sáb 10 a 14 h" /></label>
         <label className="field"><span>Instagram (usuario)</span><input name="instagram" defaultValue={a.instagram ?? ""} placeholder="musicamusicaweb" /></label>
       </section>
+      <section className="card grid gap-3 sm:grid-cols-3">
+        <h2 className="font-semibold sm:col-span-3">Datos fiscales (salen en los comprobantes)</h2>
+        <label className="field"><span>Nombre o razón social</span><input name="razon_social" defaultValue={a.razon_social ?? ""} placeholder="Nombre y apellido o razón social" /></label>
+        <label className="field"><span>CUIT</span><input name="cuit" defaultValue={a.cuit ?? ""} placeholder="20-12345678-9" inputMode="numeric" /></label>
+        <label className="field"><span>Condición fiscal</span><input name="condicion_fiscal" defaultValue={a.condicion_fiscal ?? "Monotributo"} /></label>
+      </section>
       <section className="card grid gap-3 sm:grid-cols-[1fr_200px]">
         <h2 className="font-semibold sm:col-span-2">Tienda: pago por transferencia</h2>
         <label className="field"><span>Datos para transferir (se muestran al cliente)</span>

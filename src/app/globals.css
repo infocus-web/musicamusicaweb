@@ -101,3 +101,10 @@ body {
 body:has(#panel-taller) .pie-sitio, body:has(#panel-cliente) .pie-sitio { display: none; }
 /* Modo oscuro: el rojo de los links se aclara para que se lea sobre el gris */
 .tema-oscuro .link { color: #ff8080; }
+
+/* Impresión (comprobantes): solo la hoja, sin menús */
+@media print {
+  #panel-taller aside, #panel-taller > div.sticky, .pie-sitio { display: none !important; }
+  #panel-taller main { margin-left: 0 !important; padding: 0 !important; }
+  #panel-taller, body { background: #fff !important; color: #000 !important; }
+}

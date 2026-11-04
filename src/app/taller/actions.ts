@@ -325,3 +325,71 @@ export async function anularAprobacion(id: string, trabajoId: string) {
   await supabase.from("aprobaciones").update({ estado: "anulada" }).eq("id", id).eq("estado", "pendiente");
   revalidatePath(`/taller/trabajos/${trabajoId}`);
 }
+
+/* ---------------- Cobros, insumos y comprobantes de la orden ---------------- */
+
+export async function registrarCobro(trabajoId: string, fd: FormData) {
+  const supabase = await createClient();
+  const monto = num(fd, "monto");
+  if (monto == null || monto <= 0) throw new Error("Cargá el monto.");
+  const { MEDIOS_PAGO } = await import("@/lib/gestion");
+  const medio = String(fd.get("medio") ?? "efectivo");
+  if (!MEDIOS_PAGO.some((m) => m.id === medio)) throw new Error("Medio de pago inválido.");
+  const { data: t } = await supabase.from("trabajos").select("numero, clientes(nombre)").eq("id", trabajoId).single();
+  const { error } = await supabase.from("cobros").insert({
+    trabajo_id: trabajoId, trabajo_numero: t?.numero ?? null,
+    cliente_nombre: (t?.clientes as unknown as { nombre: string } | null)?.nombre ?? null,
+    monto, medio, fecha: txt(fd, "fecha") ?? undefined, nota: txt(fd, "nota"),
+  });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
+
+export async function borrarCobro(id: string, trabajoId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("cobros").delete().eq("id", id);
+  if (error) throw new Error("Solo un administrador puede borrar cobros.");
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
+
+/** Descuenta del stock un insumo usado en la orden ("producto|variante"). */
+export async function usarInsumo(trabajoId: string, fd: FormData) {
+  const [producto, variante] = String(fd.get("item") ?? "").split("|");
+  const cantidad = Math.round(num(fd, "cantidad") ?? 1);
+  if (!producto) throw new Error("Elegí el insumo.");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("usar_insumo", { p_trabajo: trabajoId, p_producto: producto, p_variante: variante || null, p_cantidad: cantidad });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
+
+export async function quitarInsumo(id: string, trabajoId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("quitar_insumo", { p_id: id });
+  if (error) throw new Error(error.message);
+  revalidatePath(`/taller/trabajos/${trabajoId}`);
+}
+
+/** Comprobante interno de una orden (detalle = servicio + insumos; total = presupuesto). */
+export async function comprobanteDeOrden(trabajoId: string) {
+  const { exigirAdmin } = await import("@/lib/auth");
+  await exigirAdmin();
+  const supabase = await createClient();
+  const { data: existe } = await supabase.from("comprobantes").select("id").eq("trabajo_id", trabajoId).eq("anulado", false).maybeSingle();
+  if (existe) redirect(`/taller/gestion/comprobantes/${existe.id}`);
+  const { data: t } = await supabase.from("trabajos")
+    .select("id, numero, servicio, problema, presupuesto, clientes(nombre, telefono, email), instrumentos(tipo, marca, modelo)").eq("id", trabajoId).single();
+  if (!t) throw new Error("Orden no encontrada.");
+  const c = t.clientes as unknown as { nombre: string; telefono: string | null; email: string | null };
+  const i = t.instrumentos as unknown as { tipo: string; marca: string | null; modelo: string | null } | null;
+  const { data: cobros } = await supabase.from("cobros").select("medio, monto").eq("trabajo_id", trabajoId);
+  const total = Number(t.presupuesto ?? 0) || (cobros ?? []).reduce((a, x) => a + Number(x.monto), 0);
+  const medios = [...new Set((cobros ?? []).map((x) => x.medio))].join(", ") || null;
+  const detalle = [{ descripcion: `${t.servicio} — ${[i?.tipo, i?.marca, i?.modelo].filter(Boolean).join(" ")}`.trim(), cantidad: 1, precio: total }];
+  const { data: nuevo, error } = await supabase.from("comprobantes").insert({
+    trabajo_id: t.id, referencia: t.numero, cliente_nombre: c.nombre, cliente_telefono: c.telefono, cliente_email: c.email,
+    detalle, total, medio_pago: medios,
+  }).select("id").single();
+  if (error || !nuevo) throw new Error(error?.message ?? "No se pudo crear.");
+  redirect(`/taller/gestion/comprobantes/${nuevo.id}`);
+}

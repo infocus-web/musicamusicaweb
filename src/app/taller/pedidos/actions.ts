@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { obtenerStaff } from "@/lib/auth";
 import { cancelarPedido } from "@/lib/pedidos";
-import { ESTADOS_PEDIDO } from "@/lib/tienda";
+import { ESTADOS_PEDIDO, PAGOS } from "@/lib/tienda";
 
 const refrescar = (id: string) => { revalidatePath("/taller/pedidos"); revalidatePath(`/taller/pedidos/${id}`); };
 
@@ -54,4 +54,26 @@ export async function cancelar(id: string) {
   if (!staff) throw new Error("Sin permiso");
   await cancelarPedido(id);
   refrescar(id);
+}
+
+/** Comprobante interno de un pedido de la tienda (con sus ítems y el envío). */
+export async function comprobanteDePedido(id: string) {
+  const { exigirAdmin } = await import("@/lib/auth");
+  const { redirect } = await import("next/navigation");
+  await exigirAdmin();
+  const supabase = await createClient();
+  const { data: existe } = await supabase.from("comprobantes").select("id").eq("pedido_id", id).eq("anulado", false).maybeSingle();
+  if (existe) redirect(`/taller/gestion/comprobantes/${existe.id}`);
+  const { data: p } = await supabase.from("pedidos").select("*").eq("id", id).single();
+  if (!p) throw new Error("Pedido no encontrado.");
+  const { data: items } = await supabase.from("pedido_items").select("nombre, cantidad, precio").eq("pedido_id", id);
+  const detalle = (items ?? []).map((i) => ({ descripcion: i.nombre, cantidad: i.cantidad, precio: Number(i.precio) }));
+  if (Number(p.envio_costo) > 0) detalle.push({ descripcion: `Envío: ${p.envio_nombre ?? ""}`, cantidad: 1, precio: Number(p.envio_costo) });
+  if (Number(p.descuento) > 0) detalle.push({ descripcion: "Descuento", cantidad: 1, precio: -Number(p.descuento) });
+  const { data: nuevo, error } = await supabase.from("comprobantes").insert({
+    pedido_id: id, referencia: p.numero, cliente_nombre: p.nombre, cliente_doc: p.dni, cliente_telefono: p.telefono, cliente_email: p.email,
+    detalle, total: p.total, medio_pago: PAGOS[p.pago_metodo] ?? p.pago_metodo,
+  }).select("id").single();
+  if (error || !nuevo) throw new Error(error?.message ?? "No se pudo crear.");
+  redirect(`/taller/gestion/comprobantes/${nuevo.id}`);
 }
