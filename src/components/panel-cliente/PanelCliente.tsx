@@ -12,6 +12,8 @@ import { ChatCliente } from "./ChatCliente";
 import { Aprobacion } from "./Aprobacion";
 import { FormTurno } from "./FormTurno";
 import { FormClave } from "./FormClave";
+import { cookies } from "next/headers";
+import { BotonTema } from "@/app/taller/BotonTema";
 
 const PESTANAS = [
   { id: "inicio", label: "Inicio", icono: "🏠" },
@@ -49,9 +51,11 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
   const pendientes = aprobData ?? [];
   const wa = waTaller(ajustes.whatsapp, `Hola! Soy ${cliente.nombre} (${cliente.codigo}).`);
   const url = (id: string) => `${base}?tab=${id}`;
+  const oscuro = (await cookies()).get("tema-cliente")?.value === "oscuro";
 
   return (
-    <div id="panel-cliente" className="mx-auto max-w-3xl space-y-5 px-4 py-6">
+    <div id="panel-cliente" className={`min-h-screen ${oscuro ? "tema-oscuro" : ""}`}>
+    <div className="mx-auto max-w-3xl space-y-5 px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/" aria-label="Ir a la web"><Logo alto={48} prioridad /></Link>
@@ -62,6 +66,7 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
         </div>
         <div className="flex items-center gap-3 text-sm">
           {wa && <a href={wa} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-white" style={{ background: "#25D366" }}>WhatsApp</a>}
+          <BotonTema inicial={oscuro} destino="panel-cliente" cookie="tema-cliente" />
           {salir}
         </div>
       </header>
@@ -168,6 +173,7 @@ export async function PanelCliente({ cliente, token, tab = "inicio", base, salir
       )}
 
       {token && <p className="muted text-center text-xs">Este link es personal: no lo compartas.</p>}
+    </div>
     </div>
   );
 }

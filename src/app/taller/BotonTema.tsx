@@ -2,13 +2,13 @@
 import { useState } from "react";
 
 /** Botón luna/sol: oscurece el panel del taller. Se recuerda en este navegador (cookie). */
-export function BotonTema({ inicial }: { inicial: boolean }) {
+export function BotonTema({ inicial, destino = "panel-taller", cookie = "tema-taller" }: { inicial: boolean; destino?: string; cookie?: string }) {
   const [oscuro, setOscuro] = useState(inicial);
   function cambiar() {
     const n = !oscuro;
     setOscuro(n);
-    document.getElementById("panel-taller")?.classList.toggle("tema-oscuro", n);
-    document.cookie = `tema-taller=${n ? "oscuro" : "claro"}; path=/; max-age=31536000; samesite=lax`;
+    document.getElementById(destino)?.classList.toggle("tema-oscuro", n);
+    document.cookie = `${cookie}=${n ? "oscuro" : "claro"}; path=/; max-age=31536000; samesite=lax`;
   }
   return (
     <button type="button" onClick={cambiar} title={oscuro ? "Pantalla clara" : "Oscurecer pantalla"} aria-label={oscuro ? "Pantalla clara" : "Oscurecer pantalla"}
