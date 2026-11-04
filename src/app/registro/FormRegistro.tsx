@@ -7,7 +7,7 @@ import { TIPOS_INSTRUMENTO } from "@/lib/estados";
 import { InputClave } from "@/components/InputClave";
 import { CampoEmail } from "@/components/CampoEmail";
 
-export function FormRegistro() {
+export function FormRegistro({ volver }: { volver?: string }) {
   const [estado, accion, pendiente] = useActionState(registrarCliente, undefined);
   const [t] = useState(() => Date.now());
   const [conInstrumento, setConInstrumento] = useState(true);
@@ -29,7 +29,9 @@ export function FormRegistro() {
           <p className="font-mono text-3xl tracking-widest">{estado.codigo}</p>
         </div>
         <p className="text-sm">Guardá este link: ahí vas a ver el avance de tus instrumentos cuando los traigas al taller.</p>
-        <a href={estado.link} className="btn w-full">Abrir mi seguimiento</a>
+        {estado.volver
+          ? <a href={estado.volver} className="btn w-full">Continuar con mi pedido →</a>
+          : <a href={estado.link} className="btn w-full">Abrir mi seguimiento</a>}
         {estado.conClave && (
           <p className="muted text-sm">También podés entrar en <Link className="link" href="/mi-cuenta">Mi cuenta</Link> con tu código y la clave que elegiste.</p>
         )}
@@ -40,6 +42,7 @@ export function FormRegistro() {
   return (
     <form action={accion} className="card space-y-4">
       <input type="hidden" name="t" value={t} />
+      {volver && <input type="hidden" name="volver" value={volver} />}
       {/* Campo trampa para bots: las personas no lo ven */}
       <input type="text" name="sitio_web" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
@@ -74,9 +77,9 @@ export function FormRegistro() {
       </fieldset>
 
       <fieldset className="space-y-3 border-t pt-4" style={{ borderColor: "var(--line)" }}>
-        <legend className="font-semibold">Clave para Mi cuenta (opcional)</legend>
-        <label className="field"><span>Elegí una clave (mín. 6)</span><InputClave name="clave" minLength={6} autoComplete="new-password" /></label>
-        <p className="muted text-xs">Si no la cargás, igual te damos un link privado para seguir tus trabajos.</p>
+        <legend className="font-semibold">Clave para Mi cuenta{volver ? "" : " (opcional)"}</legend>
+        <label className="field"><span>Elegí una clave (mín. 6){volver ? " *" : ""}</span><InputClave name="clave" minLength={6} required={!!volver} autoComplete="new-password" /></label>
+        <p className="muted text-xs">{volver ? "La vas a usar para entrar con tu código de cliente." : "Si no la cargás, igual te damos un link privado para seguir tus trabajos."}</p>
       </fieldset>
 
       <label className="flex items-start gap-2 text-sm">

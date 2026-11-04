@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { use, useActionState } from "react";
 import { ingresarCliente } from "../actions";
 import { Logo } from "@/components/Logo";
 import { InputClave } from "@/components/InputClave";
 
-export default function IngresarClientePage() {
+export default function IngresarClientePage({ searchParams }: { searchParams: Promise<{ volver?: string }> }) {
+  const { volver } = use(searchParams);
   const [estado, accion, pendiente] = useActionState(ingresarCliente, undefined);
   return (
     <main className="min-h-screen grid place-items-center px-4">
       <form action={accion} className="card w-full max-w-sm space-y-4">
+        {volver && <input type="hidden" name="volver" value={volver} />}
         <div className="space-y-3">
           <Logo alto={72} prioridad />
           <h1 className="text-2xl font-semibold">Mi cuenta</h1>
@@ -26,7 +28,7 @@ export default function IngresarClientePage() {
         </label>
         {estado?.error && <p className="text-sm text-red-600">{estado.error}</p>}
         <button className="btn w-full" disabled={pendiente}>{pendiente ? "Ingresando…" : "Ingresar"}</button>
-        <p className="muted text-xs">¿No tenés clave? Pedísela al taller por WhatsApp. <Link href="/" className="link">Volver al inicio</Link></p>
+        <p className="muted text-xs">¿No tenés cuenta? <Link href={volver ? `/registro?volver=${encodeURIComponent(volver)}` : "/registro"} className="link">Registrate</Link>. ¿No tenés clave? Pedísela al taller por WhatsApp. <Link href="/" className="link">Volver al inicio</Link></p>
       </form>
     </main>
   );

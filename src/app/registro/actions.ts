@@ -3,13 +3,15 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { claveTelefono } from "@/lib/csv";
 import { emailCliente } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { rutaSegura } from "@/lib/cliente-actual";
 import { linkSeguimiento } from "@/lib/estados";
 import { emailValido, sugerirEmail } from "@/lib/email";
 
 export type EstadoRegistro =
   | undefined
   | { error: string }
-  | { ok: true; nuevo: true; nombre: string; codigo: string; link: string; conClave: boolean }
+  | { ok: true; nuevo: true; nombre: string; codigo: string; link: string; conClave: boolean; volver: string | null }
   | { ok: true; nuevo: false; nombre: string };
 
 const corto = (v: FormDataEntryValue | null, max = 200) => {
@@ -34,6 +36,8 @@ export async function registrarCliente(_prev: EstadoRegistro, fd: FormData): Pro
   const sugerencia = email && fd.get("email_ok") !== "1" ? sugerirEmail(email) : null;
   if (sugerencia) return { error: `Revisá el email: ¿quisiste decir ${sugerencia}? Si está bien, tocá “No, está bien así”.` };
   if (clave && clave.length < 6) return { error: "La clave tiene que tener al menos 6 caracteres." };
+  const volver = rutaSegura(fd.get("volver"));
+  if (volver && !clave) return { error: "Elegí una clave: la vas a usar para entrar y seguir con tu pedido." };
   if (fd.get("acepto") !== "on") return { error: "Necesitamos tu conformidad para guardar tus datos." };
 
   const db = createAdminClient();
@@ -68,8 +72,10 @@ export async function registrarCliente(_prev: EstadoRegistro, fd: FormData): Pro
     if (u?.user) {
       await db.from("clientes").update({ user_id: u.user.id }).eq("id", c.id);
       conClave = true;
+      // Viene de un formulario que pide cuenta (p. ej. Vendé tu usado): lo dejamos con la sesión iniciada.
+      if (volver) await (await createClient()).auth.signInWithPassword({ email: emailCliente(c.codigo), password: clave });
     }
   }
 
-  return { ok: true, nuevo: true, nombre: nombre.split(" ")[0], codigo: c.codigo, link: linkSeguimiento(c.token), conClave };
+  return { ok: true, nuevo: true, nombre: nombre.split(" ")[0], codigo: c.codigo, link: linkSeguimiento(c.token), conClave, volver: conClave ? volver : null };
 }

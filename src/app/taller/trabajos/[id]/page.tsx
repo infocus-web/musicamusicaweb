@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ESTADOS, SERVICIOS, estadoInfo, formatoFecha, formatoFechaHora, formatoPesos, linkSeguimiento, linkWhatsApp } from "@/lib/estados";
+import { ACCESORIOS, ESTADOS, SERVICIOS, estadoInfo, formatoFecha, formatoFechaHora, formatoPesos, linkSeguimiento, appWhatsApp } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { SubirAvance } from "@/components/SubirAvance";
 import { Media } from "@/components/Media";
@@ -10,8 +10,9 @@ import { actualizarTrabajo } from "../../actions";
 import { crearCasoDesdeTrabajo } from "../../nuestros-clientes/actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
-export default async function TrabajoPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TrabajoPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ recibido?: string }> }) {
   const { id } = await params;
+  const { recibido } = await searchParams;
   const supabase = await createClient();
   const { data: t } = await supabase
     .from("trabajos")
@@ -44,10 +45,29 @@ export default async function TrabajoPage({ params }: { params: Promise<{ id: st
         </p>
       </div>
 
+      {recibido && (
+        <p role="status" className="rounded-xl p-3 text-sm" style={{ background: "#dcfce7", color: "#14532d" }}>
+          <b>✓ Instrumento recibido.</b> Subí las fotos del estado en que llegó desde “Nuevo avance” (podés marcarlas como internas) y avisale al cliente por WhatsApp.
+        </p>
+      )}
+
+      {(t.accesorios?.length > 0 || t.insumos) && (
+        <section className="card grid gap-4 text-sm sm:grid-cols-2">
+          <div>
+            <h2 className="mb-1 font-semibold">Accesorios que dejó</h2>
+            {t.accesorios?.length ? <ul className="list-disc pl-5">{(t.accesorios as string[]).map((a) => <li key={a}>{a}</li>)}</ul> : <p className="muted">Ninguno</p>}
+          </div>
+          <div>
+            <h2 className="mb-1 font-semibold">Insumos que requiere</h2>
+            {t.insumos ? <ul className="list-disc pl-5">{(t.insumos as string).split("\n").filter(Boolean).map((l, i) => <li key={i}>{l}</li>)}</ul> : <p className="muted">Sin cargar</p>}
+          </div>
+        </section>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <section className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <a className="btn" href={linkWhatsApp(t.clientes.telefono, aviso)} target="_blank" rel="noreferrer">Avisar por WhatsApp</a>
+            <a className="btn" href={appWhatsApp(t.clientes.telefono, aviso)}>Avisar por WhatsApp</a>
             <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver como cliente</a>
             {["listo", "entregado"].includes(t.estado) && (
               <form action={crearCasoDesdeTrabajo.bind(null, t.id)}><button className="btn-ghost">Mostrar en Nuestros clientes</button></form>
@@ -92,6 +112,15 @@ export default async function TrabajoPage({ params }: { params: Promise<{ id: st
               </select>
             </label>
             <label className="field"><span>Problema / pedido</span><textarea name="problema" rows={3} defaultValue={t.problema ?? ""} /></label>
+            <label className="field"><span>Insumos que requiere (uno por línea)</span><textarea name="insumos" rows={3} defaultValue={t.insumos ?? ""} /></label>
+            <fieldset className="space-y-1.5 text-sm">
+              <legend className="muted">Accesorios que dejó</legend>
+              <div className="grid grid-cols-2 gap-1">
+                {ACCESORIOS.map((a) => <label key={a} className="flex items-center gap-1.5"><input type="checkbox" name="accesorios" value={a} defaultChecked={(t.accesorios ?? []).includes(a)} /> {a}</label>)}
+              </div>
+              <input name="accesorios_otros" defaultValue={((t.accesorios ?? []) as string[]).filter((a) => !ACCESORIOS.includes(a)).join(", ")} placeholder="Otros, separados por coma"
+                className="w-full rounded-xl border px-3 py-2" style={{ borderColor: "var(--line)", background: "var(--bg)" }} />
+            </fieldset>
             <div className="grid grid-cols-2 gap-3">
               <label className="field"><span>Presupuesto ($)</span><input name="presupuesto" inputMode="decimal" defaultValue={t.presupuesto ?? ""} /></label>
               <label className="field"><span>Fecha estimada</span><input name="fecha_estimada" type="date" defaultValue={t.fecha_estimada ?? ""} /></label>

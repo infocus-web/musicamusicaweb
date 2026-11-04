@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { formatoFechaHora, linkWhatsApp } from "@/lib/estados";
+import { formatoFechaHora, appWhatsApp } from "@/lib/estados";
 import { categoriaLabel, condicionInfo } from "@/lib/usados";
-import { estadoArrepentimiento, estadoTasacion, notaTasacion } from "./actions";
+import { aprobarTasacion, estadoArrepentimiento, estadoTasacion, notaTasacion } from "./actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
 const PESTANAS = [
@@ -46,7 +46,7 @@ export default async function ConsultasPage({ searchParams }: { searchParams: Pr
 
 async function Tasaciones({ tipo, ver }: { tipo: string; ver?: string }) {
   const supabase = await createClient();
-  let q = supabase.from("tasaciones").select("*").eq("tipo", tipo).order("creado_en", { ascending: false }).limit(200);
+  let q = supabase.from("tasaciones").select("*, clientes(codigo), usados(codigo, estado)").eq("tipo", tipo).order("creado_en", { ascending: false }).limit(200);
   q = ver === "todas" ? q : q.neq("estado", "cerrada");
   const { data } = await q;
   const filas = data ?? [];
@@ -76,7 +76,7 @@ async function Tasaciones({ tipo, ver }: { tipo: string; ver?: string }) {
               <span className="muted text-xs">{formatoFechaHora(t.creado_en)}</span>
             </div>
             <dl className="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
-              <dt className="muted">Cliente</dt><dd>{t.nombre} · {t.telefono}{t.email ? ` · ${t.email}` : ""}</dd>
+              <dt className="muted">Cliente</dt><dd>{t.cliente_id ? <Link href={`/taller/clientes/${t.cliente_id}`} className="link font-mono">{t.clientes?.codigo}</Link> : <span className="badge bg-zinc-200 text-zinc-700">sin cuenta</span>} {t.nombre} · {t.telefono}{t.email ? ` · ${t.email}` : ""}</dd>
               {t.anio && <><dt className="muted">Año</dt><dd>{t.anio}</dd></>}
               {t.condicion && tipo === "usado" && <><dt className="muted">Estado</dt><dd>{condicionInfo(t.condicion).label}</dd></>}
               {t.precio_pretendido && <><dt className="muted">{tipo === "presupuesto" ? "Precio que le pasaron" : "Pretende"}</dt><dd>{t.precio_pretendido}</dd></>}
@@ -91,11 +91,13 @@ async function Tasaciones({ tipo, ver }: { tipo: string; ver?: string }) {
               </div>
             )}
             <div className="flex flex-wrap items-center gap-2">
-              <a href={linkWhatsApp(t.telefono, msg)} target="_blank" rel="noreferrer" className="btn">Responder por WhatsApp</a>
+              <a href={appWhatsApp(t.telefono, msg)} className="btn">Responder por WhatsApp</a>
               {["nueva", "contactado", "cerrada"].filter((e) => e !== t.estado).map((e) => (
                 <form key={e} action={estadoTasacion.bind(null, t.id, e)}><button className="btn-ghost !py-1.5 text-sm">Marcar {e}</button></form>
               ))}
-              {tipo === "usado" && <Link href="/taller/usados" className="link text-sm">Publicarlo en usados</Link>}
+              {tipo === "usado" && (t.usado_id
+                ? <Link href={`/taller/usados/${t.usado_id}`} className="link text-sm">Ver publicación {t.usados?.codigo}{t.usados?.estado === "borrador" ? " (oculta, falta publicar)" : ""}</Link>
+                : <form action={aprobarTasacion.bind(null, t.id)}><button className="btn-ghost !py-1.5 text-sm font-semibold" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>Aprobar y crear publicación</button></form>)}
             </div>
             <form action={notaTasacion.bind(null, t.id)} className="flex gap-2">
               <input name="nota" defaultValue={t.notas_internas ?? ""} placeholder="Nota interna (tasación ofrecida, etc.)" className="flex-1 rounded-xl border px-3 py-2 text-sm" style={{ borderColor: "var(--line)", background: "var(--bg)" }} />
@@ -127,7 +129,7 @@ async function Arrepentimientos() {
           {a.referencia && <p><span className="muted">Compra/servicio: </span>{a.referencia}</p>}
           {a.detalle && <p className="whitespace-pre-line">{a.detalle}</p>}
           <div className="flex flex-wrap gap-2">
-            {a.telefono && <a className="btn !py-1.5" target="_blank" rel="noreferrer" href={linkWhatsApp(a.telefono, `Hola ${a.nombre}, recibimos tu pedido de arrepentimiento ${a.codigo}.`)}>WhatsApp</a>}
+            {a.telefono && <a className="btn !py-1.5" href={appWhatsApp(a.telefono, `Hola ${a.nombre}, recibimos tu pedido de arrepentimiento ${a.codigo}.`)}>WhatsApp</a>}
             {["recibido", "en_proceso", "resuelto"].filter((e) => e !== a.estado).map((e) => (
               <form key={e} action={estadoArrepentimiento.bind(null, a.id, e)}><button className="btn-ghost !py-1.5">Marcar {e.replace("_", " ")}</button></form>
             ))}

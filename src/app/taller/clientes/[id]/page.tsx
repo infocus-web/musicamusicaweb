@@ -2,7 +2,7 @@ import { CampoEmail } from "@/components/CampoEmail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SERVICIOS, TIPOS_INSTRUMENTO, formatoFecha, linkSeguimiento, linkWhatsApp, siteUrl } from "@/lib/estados";
+import { SERVICIOS, TIPOS_INSTRUMENTO, formatoFecha, linkSeguimiento, appWhatsApp, siteUrl } from "@/lib/estados";
 import { EstadoBadge } from "@/components/EstadoBadge";
 import { CopiarLink } from "@/components/CopiarLink";
 import { AccesoCliente } from "@/components/AccesoCliente";
@@ -49,7 +49,8 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
         <p className="break-all font-mono text-sm">{url}</p>
         <div className="flex flex-wrap gap-2">
           <CopiarLink url={url} />
-          <a className="btn" href={linkWhatsApp(c.telefono, mensaje)} target="_blank" rel="noreferrer">Enviar por WhatsApp</a>
+          <a className="btn" href={appWhatsApp(c.telefono, mensaje)}>Enviar por WhatsApp</a>
+          <Link className="btn-ghost" href={`/taller/recibir?cliente=${c.id}`}>+ Recibir instrumento</Link>
           <a className="btn-ghost" href={url} target="_blank" rel="noreferrer">Ver como cliente</a>
           <form action={regenerarLink.bind(null, c.id)}>
             <button className="btn-ghost" title="El link anterior deja de funcionar">Generar link nuevo</button>

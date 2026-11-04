@@ -7,7 +7,7 @@ import { comprimirImagen } from "@/lib/imagen";
 import { CATEGORIAS_USADOS, CONDICIONES } from "@/lib/usados";
 import { enviarTasacion, prepararFotos, type EstadoTasacion } from "./actions";
 
-export function FormTasacion({ permuta }: { permuta?: string }) {
+export function FormTasacion({ permuta, cliente }: { permuta?: string; cliente: { nombre: string; telefono: string | null; email: string | null; codigo: string } }) {
   const [t] = useState(() => Date.now());
   const [fotos, setFotos] = useState<File[]>([]);
   const [estado, setEstado] = useState<EstadoTasacion>(undefined);
@@ -17,7 +17,7 @@ export function FormTasacion({ permuta }: { permuta?: string }) {
     return (
       <div className="card space-y-2">
         <h2 className="text-xl font-semibold">¡Gracias, {estado.nombre}!</h2>
-        <p className="muted">Recibimos tu instrumento. Lo miramos y te escribimos por WhatsApp con una tasación.</p>
+        <p className="muted">Recibimos tu instrumento. Lo revisamos y te escribimos por WhatsApp con una propuesta. Nada se publica en la web sin que lo aprobemos juntos.</p>
       </div>
     );
   }
@@ -92,10 +92,10 @@ export function FormTasacion({ permuta }: { permuta?: string }) {
       </fieldset>
 
       <fieldset className="grid gap-3 border-t pt-4" style={{ borderColor: "var(--line)" }}>
-        <legend className="font-semibold">Tus datos</legend>
-        <label className="field"><span>Nombre *</span><input name="nombre" required autoComplete="name" /></label>
-        <label className="field"><span>WhatsApp *</span><input name="telefono" required inputMode="tel" autoComplete="tel" /></label>
-        <CampoEmail />
+        <legend className="font-semibold">Tus datos <span className="muted text-sm font-normal">· cliente {cliente.codigo}</span></legend>
+        <label className="field"><span>Nombre *</span><input name="nombre" required autoComplete="name" defaultValue={cliente.nombre} /></label>
+        <label className="field"><span>WhatsApp *</span><input name="telefono" required inputMode="tel" autoComplete="tel" defaultValue={cliente.telefono ?? ""} /></label>
+        <CampoEmail defaultValue={cliente.email ?? ""} />
       </fieldset>
 
       {estado && "error" in estado && <p className="text-sm text-red-600">{estado.error}</p>}

@@ -56,7 +56,7 @@ export default async function TableroPage({ searchParams }: { searchParams: Prom
         <Link href={todos ? "/taller" : "/taller?todos=1"} className="btn-ghost">
           {todos ? "Solo en curso" : "Ver todos"}
         </Link>
-        <Link href="/taller/clientes" className="btn">+ Nuevo ingreso</Link>
+        <Link href="/taller/recibir" className="btn">+ Recibir instrumento</Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

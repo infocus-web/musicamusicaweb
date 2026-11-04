@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { claveTelefono } from "@/lib/csv";
+import { clienteActual } from "@/lib/cliente-actual";
 
 const MAX_FOTOS = 6;
 
@@ -33,11 +34,15 @@ export async function enviarTasacion(fd: FormData): Promise<EstadoTasacion> {
   const t = Number(fd.get("t"));
   if (!t || Date.now() - t < 3000) return { error: "Revisá los datos y volvé a enviar." };
 
-  const nombre = txt(fd, "nombre", 120);
-  const telefono = txt(fd, "telefono", 40);
+  const tipo = fd.get("tipo") === "presupuesto" ? "presupuesto" : "usado";
+  // Vender / permutar / consignar: solo clientes registrados que iniciaron sesión.
+  const cliente = await clienteActual();
+  if (tipo === "usado" && !cliente) return { error: "Para pedir una tasación tenés que ingresar con tu código de cliente. Recargá la página." };
+
+  const nombre = txt(fd, "nombre", 120) ?? cliente?.nombre ?? null;
+  const telefono = txt(fd, "telefono", 40) ?? cliente?.telefono ?? null;
   if (!nombre || nombre.length < 3) return { error: "Escribí tu nombre." };
   if (!claveTelefono(telefono)) return { error: "Escribí un teléfono válido, con código de área." };
-  const tipo = fd.get("tipo") === "presupuesto" ? "presupuesto" : "usado";
   const marca = txt(fd, "marca", 80);
   const modelo = txt(fd, "modelo", 80);
   if (!marca && !modelo) return { error: tipo === "presupuesto" ? "Contanos qué producto o servicio te presupuestaron." : "Contanos al menos la marca o el modelo." };
@@ -53,6 +58,7 @@ export async function enviarTasacion(fd: FormData): Promise<EstadoTasacion> {
 
   const { error } = await createAdminClient().from("tasaciones").insert({
     tipo,
+    cliente_id: cliente?.id ?? null,
     nombre, telefono, email: txt(fd, "email", 160),
     categoria: txt(fd, "categoria", 40), marca, modelo,
     anio: anio > 1900 && anio < 2100 ? anio : null,

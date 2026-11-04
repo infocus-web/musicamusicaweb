@@ -30,6 +30,12 @@ export const SERVICIOS = [
   "Trastes", "Electrónica", "Restauración", "Otro",
 ];
 
+/** Accesorios que el cliente puede dejar con el instrumento (se tildan al recibirlo). */
+export const ACCESORIOS = [
+  "Estuche rígido", "Funda / gig bag", "Correa", "Cable", "Palanca de trémolo", "Llave del alma",
+  "Fuente / transformador", "Pedal", "Arco", "Pilas / batería", "Cuerdas nuevas para colocar",
+];
+
 export function formatoPesos(n: number | null | undefined) {
   if (n == null) return "—";
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
@@ -57,6 +63,16 @@ export function linkSeguimiento(token: string) {
 }
 
 /** Link de WhatsApp con el mensaje armado. Asume teléfonos de Argentina si no traen código de país. */
+/**
+ * Abre directo la aplicación de WhatsApp (escritorio o celular) con el chat y el mensaje ya escrito,
+ * sin pasar por la página web de wa.me. Para los botones del panel (requiere tener WhatsApp instalado).
+ */
+export function appWhatsApp(telefono: string | null | undefined, mensaje: string) {
+  let num = (telefono ?? "").replace(/\D/g, "");
+  if (num && !num.startsWith("54")) num = "549" + num.replace(/^0/, "");
+  return `whatsapp://send?phone=${num}&text=${encodeURIComponent(mensaje)}`;
+}
+
 export function linkWhatsApp(telefono: string | null | undefined, mensaje: string) {
   let num = (telefono ?? "").replace(/\D/g, "");
   if (num && !num.startsWith("54")) num = "549" + num.replace(/^0/, "");

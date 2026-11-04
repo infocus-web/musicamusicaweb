@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADOS_PEDIDO, PAGOS, pesos } from "@/lib/tienda";
-import { formatoFechaHora, linkWhatsApp, siteUrl } from "@/lib/estados";
+import { formatoFechaHora, appWhatsApp, siteUrl } from "@/lib/estados";
 import { cancelar, cotizarEnvio, datosInternos, estadoPedido, marcarPagado } from "../actions";
 import { BotonGuardar } from "@/components/BotonGuardar";
 
@@ -28,7 +28,7 @@ export default async function PedidoTallerPage({ params }: { params: Promise<{ i
           <p className="muted text-sm">{formatoFechaHora(p.creado_en)}</p>
         </div>
         <span className={`badge ${e.color}`}>{e.label}</span>
-        <a href={linkWhatsApp(p.telefono, msg)} target="_blank" rel="noreferrer" className="btn">WhatsApp al cliente</a>
+        <a href={appWhatsApp(p.telefono, msg)} className="btn">WhatsApp al cliente</a>
         <a href={link} target="_blank" rel="noreferrer" className="btn-ghost">Ver como cliente</a>
       </div>
 

@@ -97,6 +97,8 @@ export async function actualizarTrabajo(id: string, fd: FormData) {
     presupuesto_aprobado: fd.get("presupuesto_aprobado") === "on",
     fecha_estimada: txt(fd, "fecha_estimada"),
     notas_internas: txt(fd, "notas_internas"),
+    insumos: txt(fd, "insumos"),
+    accesorios: [...fd.getAll("accesorios").map(String), ...(txt(fd, "accesorios_otros") ?? "").split(",").map((a) => a.trim()).filter(Boolean)].slice(0, 30),
   };
   if (estado === "entregado") cambios.fecha_entrega = new Date().toISOString().slice(0, 10);
   const { error } = await supabase.from("trabajos").update(cambios).eq("id", id);
@@ -228,4 +230,62 @@ export async function borrarCliente(id: string) {
   revalidatePath("/taller/clientes");
   revalidatePath("/taller");
   redirect("/taller/clientes");
+}
+
+
+/**
+ * Recepción en un solo paso: busca al cliente (por id o por teléfono) o lo crea,
+ * carga el instrumento y abre la orden de trabajo con insumos, accesorios y estimado.
+ */
+export async function recibirInstrumento(fd: FormData) {
+  const { claveTelefono } = await import("@/lib/csv");
+  const supabase = await createClient();
+
+  let clienteId = txt(fd, "cliente_id");
+  if (!clienteId) {
+    const nombre = txt(fd, "nombre");
+    const telefono = txt(fd, "telefono");
+    if (!nombre) throw new Error("Falta el nombre del cliente.");
+    const tel = claveTelefono(telefono);
+    if (tel) {
+      const { data: existe } = await supabase.from("clientes").select("id").eq("telefono_norm", tel).limit(1).maybeSingle();
+      if (existe) clienteId = existe.id;
+    }
+    if (!clienteId) {
+      const { data: nuevo, error } = await supabase.from("clientes")
+        .insert({ nombre, telefono, email: txt(fd, "email"), origen: "taller", revisado: true })
+        .select("id").single();
+      if (error || !nuevo) throw new Error(error?.message ?? "No se pudo crear el cliente.");
+      clienteId = nuevo.id;
+    }
+  }
+
+  const { data: inst, error: e1 } = await supabase.from("instrumentos").insert({
+    cliente_id: clienteId,
+    tipo: txt(fd, "tipo") ?? "Otro",
+    marca: txt(fd, "marca"),
+    modelo: txt(fd, "modelo"),
+    numero_serie: fd.get("sin_serie") === "on" ? null : txt(fd, "numero_serie"),
+  }).select("id").single();
+  if (e1 || !inst) throw new Error(e1?.message ?? "No se pudo cargar el instrumento.");
+
+  const otros = (txt(fd, "accesorios_otros") ?? "").split(",").map((a) => a.trim()).filter(Boolean);
+  const accesorios = [...fd.getAll("accesorios").map(String), ...otros].slice(0, 30);
+
+  const { data: t, error: e2 } = await supabase.from("trabajos").insert({
+    cliente_id: clienteId,
+    instrumento_id: inst.id,
+    servicio: txt(fd, "servicio") ?? "Otro",
+    problema: txt(fd, "problema"),
+    insumos: txt(fd, "insumos"),
+    accesorios,
+    presupuesto: num(fd, "presupuesto"),
+    fecha_estimada: txt(fd, "fecha_estimada"),
+    notas_internas: txt(fd, "notas_internas"),
+  }).select("id").single();
+  if (e2 || !t) throw new Error(e2?.message ?? "No se pudo crear la orden.");
+
+  await supabase.from("avances").insert({ trabajo_id: t.id, estado: "recibido", descripcion: "Recibimos tu instrumento en el taller." });
+  revalidatePath("/taller");
+  redirect(`/taller/trabajos/${t.id}?recibido=1`);
 }

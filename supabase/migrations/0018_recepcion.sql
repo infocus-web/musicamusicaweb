@@ -1,0 +1,3 @@
+-- Recepción del instrumento: insumos que requiere el trabajo y accesorios que deja el cliente.
+alter table public.trabajos add column if not exists insumos text;                          -- uno por línea
+alter table public.trabajos add column if not exists accesorios text[] not null default '{}'; -- estuche, cable, correa…
